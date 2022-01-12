@@ -22,4 +22,4 @@ We will be creating a sample application that is based off the _scaffold app inc
 - Point your browser to http://127.0.0.1:8000/grid_tutorial and you should see a very plain looking Hello page (we'll add style to this later) 
 
 
-[Back to Index](index.md)
+[Back to Index](../README.md)

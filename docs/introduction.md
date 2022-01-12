@@ -11,4 +11,4 @@ the box.  A Bootstrap implementation is coming soon.
 What follows in an exploration into the features of the py4web grid and examples showing
 how to implement these features.
 
-[Back to Index](index.md)
+[Back to Index](../README.md)
