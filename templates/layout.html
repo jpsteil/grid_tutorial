@@ -1,73 +1,122 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <base href="[[=URL('static')]]/">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="data:image/x-icon;base64,AAABAAEAAQEAAAEAIAAwAAAAFgAAACgAAAABAAAAAgAAAAEAIAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAPAAAAAA=="/>
-    <link rel="stylesheet" href="css/no.css">
+    <title>py4web Grid Tutorial</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
     <style>.py4web-validation-error{margin-top:-16px; font-size:0.8em;color:red}</style>
     [[block page_head]]<!-- individual pages can customize header here -->[[end]]
   </head>
   <body>
-    <header>
-      <!-- Navigation bar -->
-      <nav class="black">
-        <!-- Logo -->
-        <a href="[[=URL('index')]]">
-          <b>py4web <script>document.write(window.location.href.split('/')[3]);</script></b>
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="https://py4web.com">
+      <img src="[[=URL('static','images/py4web_logo.png')]]" width="30" height="30">
+    </a>
+
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div id="navbarBasicExample" class="navbar-menu">
+    <div class="navbar-start">
+      <a href="[[=URL('index') ]]" class="navbar-item">
+        Home
+      </a>
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Basic
         </a>
-        <!-- Do not touch this -->
-        <label for="hamburger">☰</label>
-        <input type="checkbox" id="hamburger">
-        <!-- Left menu ul/li -->
-        [[block page_left_menu]][[end]]
-        <!-- Right menu ul/li -->
-        <ul>
+
+        <div class="navbar-dropdown">
+          <a href="[[=URL('basic_grid') ]]" class="navbar-item">
+            Grid
+          </a>
+          <a href="[[=URL('columns') ]]" class="navbar-item">
+            Columns
+          </a>
+          <a href="[[=URL('column_headings') ]]" class="navbar-item">
+            Column Headings
+          </a>
+          <a href="[[=URL('search') ]]" class="navbar-item">
+            Search
+          </a>
+          <a href="[[=URL('crud') ]]" class="navbar-item">
+            CRUD
+          </a>
+          <a href="[[=URL('action_buttons') ]]" class="navbar-item">
+            Action Buttons
+          </a>
+        </div>
+      </div>
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Advanced
+        </a>
+
+        <div class="navbar-dropdown">
+          <a href="[[=URL('advanced_columns') ]]" class="navbar-item">
+            Columns
+          </a>
+          <a href="[[=URL('advanced_search') ]]" class="navbar-item">
+            Search
+          </a>
+          <a href="[[=URL('advanced_htmx') ]]" class="navbar-item">
+            htmx - Advanced reactive grids
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="buttons">
           [[if globals().get('user'):]]
-          <li>
-            <a class="navbar-link is-primary">
-              [[=globals().get('user',{}).get('email')]]
+            [[=globals().get('user',{}).get('email')]]
+            <a href="[[=URL('auth/profile')]]" class="button is-light">
+              <strong>Profile</strong>
             </a>
-            <ul>
-              <li><a href="[[=URL('auth/profile')]]">Edit Profile</a></li>
-              [[if 'change_password' in globals().get('actions',{}).get('allowed_actions',{}):]]
-                <li><a href="[[=URL('auth/change_password')]]">Change Password</a></li>
-              [[pass]]
-              <li><a href="[[=URL('auth/logout')]]">Logout</a></li>
-            </ul>
-          </li>
-          [[else:]]
-          <li>
-            Login
-            <ul>
-              <li><a href="[[=URL('auth/register')]]">Sign up</a></li>
-              <li><a href="[[=URL('auth/login')]]">Log in</a></li>
-            </ul>
-          </li>
-          [[pass]]
-        </ul>
-      </nav>
-    </header>
-    <!-- beginning of HTML inserted by extending template -->
-    <center>
+            <a href="[[=URL('auth/change_password')]]" class="button is-light">
+              <strong>Change Password</strong>
+            </a>
+            <a href="[[=URL('auth/logout')]]" class="button is-light">
+              <strong>Logout</strong>
+            </a>
+          [[else: ]]
+            <a href="[[=URL('auth/register')]]" class="button is-primary">
+              <strong>Sign up</strong>
+            </a>
+            <a href="[[=URL('auth/login')]]" class="button is-light">
+              Log in
+            </a>
+          [[pass ]]
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>  <section class="section">
+    <div class="container">
       <div>
         <!-- Flash alert messages, first optional one in data-alert -->
         <flash-alerts class="padded" data-alert="[[=globals().get('flash','')]]"></flash-alerts>
       </div>
+      <h1 class="title">
+        py4web Grid Tutorial
+      </h1>
+      <p class="subtitle">
+        Powerful pure-HTML grids with py4web
+      </p>
       <main class="padded">
-        <!-- contect injected by extending page -->
         [[include]]
       </main>
-    </center>
-    <!-- end of HTML inserted by extending template -->
-    <footer class="black padded">
-      <p>
-        Made with py4web
-      </p>
-    </footer>
+    </div>
+  </section>
   </body>
-  <!-- You've gotta have utils.js -->
   <script src="js/utils.js"></script>
   [[block page_scripts]]<!-- individual pages can add scripts here -->[[end]]
 </html>

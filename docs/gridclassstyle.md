@@ -1,34 +1,56 @@
 # GridClassStyle
 
-py4web ships with its own css framework, no.css. For this tutorial we will be using the popular Bulma css framework. The py4web grid supports the Bulma css framework out of the box with default Bulma styling.
+py4web ships with its own css framework, no.css. But, for this tutorial we will be 
+using the popular Bulma css framework
 
-To get a py4web app to use the Bulma framework instead of no.css we have to replace a line in the /templates/layout.py template.
+In the [Getting Started / Styling](getting_started.md) section we setup our application
+to use Bulma instead of no.css.
 
-Open up /templates/layout.py and locate this line:
+By default, forms and grids will use no.css for styling, but we can override that. To use 
+Bulma styling for forms or grids, you first have to import the appropriate class into your 
+python file.
 
-`<link rel="stylesheet" href="css/no.css">`
-
-...and replace it with this one...
-
-`<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">`
-
-Now you can use Bulma styling for your forms and grids.
-
-For use with forms, set `formstyle=FormStyleBulma` when instantiating your forms.
-
-To use with grids, set the following parameters on your call to grid()
-
-```
-grid_class_style=GridClassStyleBulma,
-formstyle=FormStyleBulma
+```python
+from py4web.utils.form import Form, FormStyleBulma
+from py4web.utils.grid import Grid, GridClassStyleBulma
 ```
 
-FormStyleBulma can be imported using 
+Then, when instantiating a Form you can pass the appropriate class when instantiating.  Ex:
 
-`from py4web.utils.form import FormStyleBulma`
+```python
+my_form = Form(tablname, formstyle=FormStyleBulma)
+```
 
-GridClassStyleBulma can be imported using 
+or
 
-`from py4web.utils.grid import GridClassStyleBulma`
+```python
+my_grid = Grid(path, tablename, formstyle=FormStyleBulma, grid_class_style=GridClassStyleBulma)
+```
+
+As you can see, it can be a bother to have to provide multiple boilerplate options to our grids 
+every time you want to instantiate one. To make this easier we recommend creating  a GRID_DEFAULTS 
+variable in your common.py file that can be used later to override common defaults on all of 
+my grids (works for forms as well).
+
+In common.py, add these imports:
+
+```python
+from py4web.utils.form import FormStyleBulma
+from py4web.utils.grid import GridClassStyleBulma
+```
+
+Then (also in common.py) define your GRID_DEFAULTS:
+
+```python
+GRID_DEFAULTS = dict(formstyle=FormStyleBulma,
+                     grid_class_style=GridClassStyleBulma)
+```
+
+Now, whenever we instantiate a grid we will pass **GRID_DEFAULTS which will effectively 
+override the standard grid defaults.
+
+```python
+my_grid = Grid(path, tablename, **GRID_DEFAULTS)
+```
 
 [Back to Index](../README.md)

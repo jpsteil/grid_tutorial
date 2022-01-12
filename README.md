@@ -3,7 +3,7 @@
 A tutorial to walk through the use and features of the py4web grid.
 
 1. [Introduction](docs/introduction.md)
-2. [Getting started](docs/getting_started.md)
+2. [Getting started / Styling](docs/getting_started.md)
 3. [The Database](docs/the_database.md)
 4. [GridClassStyle](docs/gridclassstyle.md)
 5. [Basic Example](docs/basic_example.md)

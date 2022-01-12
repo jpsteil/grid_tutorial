@@ -1,7 +1,57 @@
 [[extend 'layout.html']]
 
-<div class="section">
-  <div class="vars">
-      [[=message]]
-  </div>
+<div class="subtitle">Basic</div>
+<div class="content">
+<ul>
+    <li>
+          <a href="[[=URL('basic_grid') ]]">
+            Grid
+          </a>
+    </li>
+    <li>
+          <a href="[[=URL('columns') ]]">
+            Columns
+          </a>
+    </li>
+    <li>
+          <a href="[[=URL('column_headings') ]]">
+            Column Headings
+          </a>
+    </li>
+    <li>
+          <a href="[[=URL('search') ]]">
+            Search
+          </a>
+    </li>
+    <li>
+          <a href="[[=URL('crud') ]]">
+            CRUD
+          </a>
+    </li>
+    <li>
+          <a href="[[=URL('action_buttons') ]]">
+            Action Buttons
+          </a>
+    </li>
+</ul>
+</div>
+<div class="subtitle" style="padding-top: 2rem;">Advanced</div>
+<div class="content">
+<ul>
+    <li>
+          <a href="[[=URL('advanced_columns') ]]">
+            Columns
+          </a>
+    </li>
+    <li>
+          <a href="[[=URL('advanced_search') ]]">
+            Search
+          </a>
+    </li>
+    <li>
+          <a href="[[=URL('advanced_htmx') ]]">
+            htmx - Advanced reactive grids
+          </a>
+    </li>
+</ul>
 </div>
