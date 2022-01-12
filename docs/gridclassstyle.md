@@ -49,7 +49,10 @@ GRID_DEFAULTS = dict(formstyle=FormStyleBulma,
 Now, whenever we instantiate a grid we will pass **GRID_DEFAULTS which will effectively 
 override the standard grid defaults.
 
+Example assuming you are in controllers.py
 ```python
+from .common import GRID_DEFAULTS
+
 my_grid = Grid(path, tablename, **GRID_DEFAULTS)
 ```
 
