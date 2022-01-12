@@ -10,7 +10,7 @@ First - go to you settings.py in your apps root and make sure that fake migrate 
 **settings.py** ->
 `DB_FAKE_MIGRATE = True`
 
-Without further delay, the database schema
+Without further delay, the database schema.  You can either add it all now or we will add the parts as needed as we walk through the tutorial.
 
 ```
 db.define_table(
