@@ -152,6 +152,7 @@ db.define_table(
     Field("unit_price", "decimal(11,2)"),
     Field("quantity", "integer"),
     Field("discount", "decimal(11,2)", default=0),
-)```
+)
+```
 
 [Back to Index](../README.md)
