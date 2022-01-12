@@ -9,5 +9,7 @@
 .deposit
 settings_private.py
 
-/databases/*
+/databases/*.table
+/databases/*.log
+
 
