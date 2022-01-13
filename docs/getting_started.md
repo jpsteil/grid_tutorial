@@ -235,4 +235,6 @@ should see a whole new page, looking something like this:
 
 ![](../static/images/grid_tutorial_start.png)
 
+NOTE: While we have put the necessary HTML elements in place to support user registration and authentication, we will not be enabling this in any of our demos as that is outside the scope of this tutorial.  Also, we did not enable Bulma styling on any Auth related pages.
+
 [Back to Index](../README.md)

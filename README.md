@@ -7,7 +7,7 @@ A tutorial to walk through the use and features of the py4web grid.
 3. [The Database](docs/the_database.md)
 4. [GridClassStyle](docs/gridclassstyle.md)
 5. [Basic Example](docs/basic_example.md)
-6. [query, field_id, show_id, orderby, left](docs/query.md)
+6. [Commonly used parameters](docs/common_parameters.md)
 7. [Basic columns](docs/basic_columns.md)
 8. [Custom Column Headings](docs/custom_column_headings.md)
 9. [Basic search with search_queries](docs/basic_search.md)

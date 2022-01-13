@@ -12,6 +12,8 @@ from py4web.utils.downloader import downloader
 from pydal.tools.tags import Tags
 from py4web.utils.factories import ActionFactory
 from . import settings
+from py4web.utils.form import Form, FormStyleBulma
+from py4web.utils.grid import Grid, GridClassStyleBulma
 
 # #######################################################
 # implement custom loggers form settings.LOGGERS
@@ -195,3 +197,5 @@ auth.enable(uses=(session, T, db), env=dict(T=T))
 # #######################################################
 unauthenticated = ActionFactory(db, session, T, flash, auth)
 authenticated = ActionFactory(db, session, T, flash, auth.user)
+
+GRID_DEFAULTS = dict(formstyle=FormStyleBulma, grid_class_style=GridClassStyleBulma)
