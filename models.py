@@ -31,6 +31,7 @@ db.define_table(
         "district",
         "reference district",
         requires=IS_IN_DB(db, "district.id", "%(name)s", zero=".."),
+        represent=lambda u: u.name if u else "N/A",
     ),
 )
 

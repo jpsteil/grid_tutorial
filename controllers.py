@@ -35,3 +35,28 @@ def districts(path=None):
 def no_more_than_8_districts(form):
     if len(db(db.district.id > 0).select()) >= 8:
         form.errors["name"] = "Too many districts, can only have 8."
+
+
+@action("columns", method=["POST", "GET"])
+@action("columns/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "grid.html",
+)
+def columns(path=None):
+    grid = Grid(
+        path,
+        db.customer,
+        columns=[
+            db.customer.name,
+            db.customer.contact,
+            db.customer.title,
+            db.district.name,
+        ],
+        left=[db.district.on(db.customer.district == db.district.id)],
+        headings=["Name", "Contact", "Title", "District"],
+        **GRID_DEFAULTS,
+    )
+
+    return dict(grid=grid)
