@@ -9,7 +9,7 @@ In the last section we created our first grid, a fully capable add, change, dele
 - [include_action_button_text](#include_action_button_text)
 - [validation](#validation)
 
-### orderby [back to top](#commonly-used-parameters)
+### orderby
 As you can see in our previous example, the rows are displayed in entry order. However, that makes it hard on the user to locate the records they are looking for.  It would be much easier if we could display the districts in name order. 
 
 Doing so is each.  Simply add the `orderby=db.district.name` parameter to the Grid call.
@@ -24,6 +24,8 @@ grid = Grid(
 ```
 
 Go back to your Home page and then click on your Basic Grid again and now your records should be in alphabetical order by name.
+
+[back to top](#commonly-used-parameters)
 
 ## show_id
 By default, the grid will not display your 'id' columns, even if you pass them in your column list.  However, sometimes you want that 'id' field to display. 
@@ -56,6 +58,8 @@ grid = Grid(
 )
 ```
 The grid now displays only 5 rows at a time. You can now also see what the paging buttons look like and how they work.
+
+[back to top](#commonly-used-parameters)
 
 ## headings
 The grid will always build default column headings based on the label of the field it is displaying. Sometimes this isn't what you want. The py4web grid allows you to change the names of the column headings by passing a list of strings to the Grid call.
@@ -91,6 +95,8 @@ Go ahead and try it.
 
 When passing headings, the py4web grid will apply the custom headings from left to right. You do NOT need to provide a heading for each column but just know that they are applied from left to right.
 
+[back to top](#commonly-used-parameters)
+
 ## include_action_button_text
 We've already discussed what an action button is. Action buttons are the New, Details, Edit and Delete buttons.  Pre/Post Action buttons will be discussed later, but this parameter applies to them as well.
 
@@ -109,6 +115,8 @@ grid = Grid(
 )
 ```
 Now, just the button icon is displayed. But, if you hover over the button, the text will appear as a standard 'title' attribute would.
+
+[back to top](#commonly-used-parameters)
 
 ### validation
 A py4web form allows you to specify a custom validation routine that will be called to after the standard database validations have run. This give the developer the opportunity to do some additional validation on a row that is being created or updated by a form.
@@ -134,4 +142,7 @@ def no_more_than_8_districts(form):
     if len(db(db.district.id > 0).select()) >= 8:
         form.errors["name"] = "Too many districts, can only have 8."
 ```
+
+[back to top](#commonly-used-parameters)
+
 [Back to Index](../README.md)
