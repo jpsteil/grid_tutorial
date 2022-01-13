@@ -3,10 +3,13 @@
 In the last section we created our first grid, a fully capable add, change, delete tool to maintain any table. In this section we'll introduce a few additional parameters that you can pass when instantiating your grid that will affect how it behaves.
 
 - [orderby](#orderby)
-- [validation](#validation)
 - [show_id](#show_id)
+- [rows_per_page](#rows_per_page)
+- [headings](#headings)
+- [include_action_button_text](#include_action_button_text)
+- [validation](#validation)
 
-### orderby
+### orderby [back to top](#commonly-used-parameters)
 As you can see in our previous example, the rows are displayed in entry order. However, that makes it hard on the user to locate the records they are looking for.  It would be much easier if we could display the districts in name order. 
 
 Doing so is each.  Simply add the `orderby=db.district.name` parameter to the Grid call.
