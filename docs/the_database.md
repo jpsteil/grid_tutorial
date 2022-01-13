@@ -1,7 +1,7 @@
 # The Database
 
 For this tutorial we will be using a SQLite database containing customers and orders.  
-You should copy /databases/grid_tutorial.db from this repo and copy to your application folder.
+You should copy /databases/grid_tutorial.db from this repo and copy to your application /databases folder.
 
 Once that is done we need to make a couple of changes to settings.py
 
