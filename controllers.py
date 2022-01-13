@@ -25,7 +25,13 @@ def districts(path=None):
         show_id=True,
         rows_per_page=5,
         headings=[XML("District<br />ID")],
+        validation=no_more_than_8_districts,
         **GRID_DEFAULTS,
     )
 
     return dict(grid=grid)
+
+
+def no_more_than_8_districts(form):
+    if len(db(db.district.id > 0).select()) >= 8:
+        form.errors["name"] = "Too many districts, can only have 8."
