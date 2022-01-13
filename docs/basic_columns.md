@@ -131,7 +131,7 @@ A better solution to this issue is to join the district table and use the name f
     db,
     "grid.html",
 )
-def districts(path=None):
+def columns(path=None):
     grid = Grid(
         path,
         db.customer,
@@ -151,7 +151,7 @@ This should look similar. However, there are 2 difference. The first is that the
     db,
     "grid.html",
 )
-def districts(path=None):
+def columns(path=None):
     grid = Grid(
         path,
         db.customer,

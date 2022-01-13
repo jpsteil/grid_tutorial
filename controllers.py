@@ -60,3 +60,36 @@ def columns(path=None):
     )
 
     return dict(grid=grid)
+
+
+@action("search", method=["POST", "GET"])
+@action("search/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "grid.html",
+)
+def search(path=None):
+    search_queries = [
+        ["name", lambda value: db.customer.name.contains(value)],
+        ["contact", lambda value: db.customer.contact.contains(value)],
+        ["title", lambda value: db.customer.title.contains(value)],
+        ["district", lambda value: db.district.name.contains(value)],
+    ]
+
+    grid = Grid(
+        path,
+        db.customer,
+        columns=[
+            db.customer.name,
+            db.customer.contact,
+            db.customer.title,
+            db.district.name,
+        ],
+        left=[db.district.on(db.customer.district == db.district.id)],
+        search_queries=search_queries,
+        headings=["Name", "Contact", "Title", "District"],
+        **GRID_DEFAULTS,
+    )
+
+    return dict(grid=grid)
