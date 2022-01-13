@@ -19,7 +19,7 @@ We will be creating a sample application that is based off the _scaffold app inc
 - Locate the apps directory that you created in the install process (py4web setup apps)
 - Inside the apps directory copy the _scaffold directory and all its contents to a new directory call grid_tutorial
 - start up py4web with the `py4web run apps` command
-- Point your browser to http://127.0.0.1:8000/grid_tutorial and you should see a very plain looking Hello page (we'll add style to this later) 
+- Point your browser to http://127.0.0.1:8000/grid_tutorial and you should see a very plain looking Hello page.
 
 ## Style for Grid Tutorial application
 Now that we have py4web working, let's change up that default page. To do this we're simply going to copy and 
@@ -70,9 +70,6 @@ First we're going to replace everything in templates/layout.html with the follow
           </a>
           <a href="[[=URL('columns') ]]" class="navbar-item">
             Columns
-          </a>
-          <a href="[[=URL('column_headings') ]]" class="navbar-item">
-            Column Headings
           </a>
           <a href="[[=URL('search') ]]" class="navbar-item">
             Search
@@ -171,11 +168,6 @@ Next we'll cut and paste the following block into templates/index.html
     <li>
           <a href="[[=URL('columns') ]]">
             Columns
-          </a>
-    </li>
-    <li>
-          <a href="[[=URL('column_headings') ]]">
-            Column Headings
           </a>
     </li>
     <li>
