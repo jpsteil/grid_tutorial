@@ -25,6 +25,10 @@ You can test this and see it is the same as the columns endpoint.
 
 Now, lets add the ability to search by name, contact, title or district. We'll do this by adding `search_queries=[search_queries]` to our Grid call.
 
+A search_query is a list of 2 pieces of information. 
+1. The name to appear in the dropdown search field selector
+2. A callable that will generate a sub-query to be applied to the primary query for the grid
+
 Here is our new controller
 ```python
 @action("search", method=["POST", "GET"])
