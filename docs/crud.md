@@ -436,9 +436,6 @@ Now we've customized which fields are shown on different actions and set default
 even if they don't appear on the form.
 [back to top](#crud)
 
-## Handling Field Defaults
-
-[back to top](#crud)
 
 ## Custom Forms
 The goal of this exercise is to provide a custom details form for our customer CRUD. This
