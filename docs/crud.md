@@ -302,25 +302,6 @@ if path:
     grid_action, record_id, *_ = path.split('/')
 ```
 
-TODO:  The following need to be updated in grid.py
-```python
-    def is_editable(self, row):
-        if callable(self.param.editable) and row:
-            return self.param.editable(row)
-        return self.param.editable
-
-    def is_readable(self, row):
-        if callable(self.param.details) and row:
-            return self.param.details(row)
-        return self.param.details
-
-    def is_deletable(self, row):
-        if callable(self.param.deletable) and row:
-            return self.param.deletable(row)
-        return self.param.deletable
-```
-The issues may be bigger than this. When using Row based Access Control on my grid I set Editable to False (though a lambda) and Details to True through a lambda. Buttons display as expected, but when displaying details for a grid that is not editable, I'm able to change details to editable in the URL bar and the edit page is displayed. This needs further testing/evaluation and if this is truly the case, it must be addressed.
-
 
 [back to top](#crud)
 
