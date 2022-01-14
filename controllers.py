@@ -94,3 +94,74 @@ def search(path=None):
     )
 
     return dict(grid=grid)
+
+
+@action("crud", method=["POST", "GET"])
+@action("crud/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "grid.html",
+)
+def crud(path=None):
+    if path and path.split("/")[0] == "edit":
+        # we're going to build or process the edit form
+        db.customer.name.writable = False
+
+    search_queries = [
+        ["name", lambda value: db.customer.name.contains(value)],
+        ["contact", lambda value: db.customer.contact.contains(value)],
+        ["title", lambda value: db.customer.title.contains(value)],
+        ["district", lambda value: db.district.name.contains(value)],
+    ]
+    grid = Grid(
+        path,
+        db.customer,
+        columns=[
+            db.customer.name,
+            db.customer.contact,
+            db.customer.title,
+            db.district.name,
+        ],
+        left=[db.district.on(db.customer.district == db.district.id)],
+        headings=["Name", "Contact", "Title", "District"],
+        search_queries=search_queries,
+        field_id=db.customer.id,
+        details=lambda row: True
+        if (
+            ("customer" in row and row.customer.title == "Owner")
+            | ("title" in row and row.title == "Owner")
+        )
+        else False,
+        editable=lambda row: True
+        if (
+            ("customer" in row and row.customer.title != "Owner")
+            | ("title" in row and row.title != "Owner")
+        )
+        else False,
+        deletable=lambda row: True
+        if (
+            ("customer" in row and row.customer.title == "Sales Agent")
+            | ("title" in row and row.title == "Sales Agent")
+        )
+        else False,
+        **GRID_DEFAULTS,
+    )
+
+    return dict(grid=grid)
+
+
+def can_user_access(action, group_number):
+    if action == "create":
+        if group_number in [1, 2, 5, 7]:
+            return True
+    elif action == "details":
+        if group_number in [3, 4, 6]:
+            return True
+    elif action == "editable":
+        if group_number in [2, 5, 6, 7]:
+            return True
+    elif action == "deletable":
+        if group_number in [7]:
+            return True
+    return False
