@@ -562,7 +562,21 @@ def crud(path=None):
 
     return dict(grid=grid)
 ```
-It's really pretty simple once you know what is available. Here is a list of the param's
+It's really pretty simple once you know what is available. All we added here were three 
+lines:
+
+First, in the Grid instantiation
+```python
+    auto_process=False,
+```
+Second, afer instantiation
+
+```python
+    grid.param.details_submit_value = "Done"
+    grid.process()
+
+```
+Here is a list of the param's
 (and their default values) that you can set after instantiation but before calling `grid.process()`.
 
 - new_sidecar=None
@@ -587,5 +601,6 @@ appears on the submit button for each of the different actions.
 The xxx_action_button_text allows you to override the default text that py4web places 
 on the standard action buttons.
 
+[back to top](#crud)
 
 [Back to Index](../README.md)

@@ -14,5 +14,4 @@ A tutorial to walk through the use and features of the py4web grid.
 11. [Action Buttons](docs/action_buttons.md)
 12. [Advanced columns](docs/advanced_columns.md)
 13. [Advanced Search](docs/advanced_search.md)
-14. [Other parameters](docs/other_parameters.md)
 15. [htmx - Advanced reactive grids](docs/htmx.md)
