@@ -101,12 +101,22 @@ def search(path=None):
 @action.uses(
     session,
     db,
-    "grid.html",
+    "customer_grid.html",
 )
 def crud(path=None):
     if path and path.split("/")[0] == "edit":
         # we're going to build or process the edit form
         db.customer.name.writable = False
+    elif path and path.split("/")[0] == "details":
+        db.customer.country.readable = False
+        db.customer.district.readable = False
+    elif path and path.split("/")[0] == "new":
+        db.customer.title.default = "President"
+        db.customer.country.default = "United States"
+        north_district = db(db.district.name == "North").select().first()
+        db.customer.district.default = north_district.id
+        db.customer.district.readable = False
+        db.customer.district.writable = False
 
     search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
@@ -145,8 +155,12 @@ def crud(path=None):
             | ("title" in row and row.title == "Sales Agent")
         )
         else False,
+        auto_process=False,
         **GRID_DEFAULTS,
     )
+
+    grid.param.details_submit_value = "Done"
+    grid.process()
 
     return dict(grid=grid)
 

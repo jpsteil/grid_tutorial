@@ -1,0 +1,23 @@
+[[extend 'layout.html']]
+
+[[if grid.action == 'details': ]]
+
+    [[form = grid.render() ]]
+    [[=form.custom.begin ]]
+    <div class="card mb-1">
+        <div class="card-header">
+            <div class="card-header-title">Customer Details</div>
+        </div>
+        <div class="card-content">
+            [[for field in form.table: ]]
+                [[if field.readable and field.name != 'id': ]]
+                    [[=form.custom.widgets[field.name] ]]
+                [[pass ]]
+            [[pass ]]
+        </div>
+    </div>
+    [[=form.custom.submit ]]
+    [[=form.custom.end ]]
+[[else: ]]
+    [[=grid.render()]]
+[[pass ]]

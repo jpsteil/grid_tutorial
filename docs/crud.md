@@ -11,9 +11,9 @@ We'll then look at how to manage which fields appear on your CRUD forms.
 
 - [Managing Fields](#managing-fields)
 
-Finally we'll look at how to provide defaults to read-only fields that may or may not appear on your CRUD forms.
+Finally, we'll take a quick look at how we can fully customize the layout of our forms.
 
-- [Handling Field Defaults](#handling-field-defaults)
+- [Custom Forms](#custom-forms)
 
 For our CRUD examples we'll be creating CRUD forms over the customer table. No changes to the model are necessary.
 
@@ -302,11 +302,293 @@ if path:
     grid_action, record_id, *_ = path.split('/')
 ```
 
+Now, for the details action we aren't going to display the country or district fields.
+```python
+@action("crud", method=["POST", "GET"])
+@action("crud/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "grid.html",
+)
+def crud(path=None):
+    if path and path.split("/")[0] == "edit":
+        # we're going to build or process the edit form
+        db.customer.name.writable = False
+    elif path and path.split("/")[0] == "details":
+        db.customer.country.readable = False
+        db.customer.district.readable = False
 
+    search_queries = [
+        ["name", lambda value: db.customer.name.contains(value)],
+        ["contact", lambda value: db.customer.contact.contains(value)],
+        ["title", lambda value: db.customer.title.contains(value)],
+        ["district", lambda value: db.district.name.contains(value)],
+    ]
+    grid = Grid(
+        path,
+        db.customer,
+        columns=[
+            db.customer.name,
+            db.customer.contact,
+            db.customer.title,
+            db.district.name,
+        ],
+        left=[db.district.on(db.customer.district == db.district.id)],
+        headings=["Name", "Contact", "Title", "District"],
+        search_queries=search_queries,
+        field_id=db.customer.id,
+        details=lambda row: True
+        if (
+            ("customer" in row and row.customer.title == "Owner")
+            | ("title" in row and row.title == "Owner")
+        )
+        else False,
+        editable=lambda row: True
+        if (
+            ("customer" in row and row.customer.title != "Owner")
+            | ("title" in row and row.title != "Owner")
+        )
+        else False,
+        deletable=lambda row: True
+        if (
+            ("customer" in row and row.customer.title == "Sales Agent")
+            | ("title" in row and row.title == "Sales Agent")
+        )
+        else False,
+        **GRID_DEFAULTS,
+    )
+
+    return dict(grid=grid)
+```
+
+That wasn't too difficult. Now let's look at adding a new record.  For this, let's set 
+some defaults. We'll default the title field to 'President', the country to United States and 
+the district to North. We'll complicate things a bit by not displaying the district on the 
+'new' page as well.
+```python
+@action("crud", method=["POST", "GET"])
+@action("crud/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "grid.html",
+)
+def crud(path=None):
+    if path and path.split("/")[0] == "edit":
+        # we're going to build or process the edit form
+        db.customer.name.writable = False
+    elif path and path.split("/")[0] == "details":
+        db.customer.country.readable = False
+        db.customer.district.readable = False
+    elif path and path.split("/")[0] == "new":
+        db.customer.title.default = "President"
+        db.customer.country.default = "United States"
+        north_district = db(db.district.name == "North").select().first()
+        db.customer.district.default = north_district.id
+        db.customer.district.readable = False
+        db.customer.district.writable = False
+
+    search_queries = [
+        ["name", lambda value: db.customer.name.contains(value)],
+        ["contact", lambda value: db.customer.contact.contains(value)],
+        ["title", lambda value: db.customer.title.contains(value)],
+        ["district", lambda value: db.district.name.contains(value)],
+    ]
+    grid = Grid(
+        path,
+        db.customer,
+        columns=[
+            db.customer.name,
+            db.customer.contact,
+            db.customer.title,
+            db.district.name,
+        ],
+        left=[db.district.on(db.customer.district == db.district.id)],
+        headings=["Name", "Contact", "Title", "District"],
+        search_queries=search_queries,
+        field_id=db.customer.id,
+        details=lambda row: True
+        if (
+            ("customer" in row and row.customer.title == "Owner")
+            | ("title" in row and row.title == "Owner")
+        )
+        else False,
+        editable=lambda row: True
+        if (
+            ("customer" in row and row.customer.title != "Owner")
+            | ("title" in row and row.title != "Owner")
+        )
+        else False,
+        deletable=lambda row: True
+        if (
+            ("customer" in row and row.customer.title == "Sales Agent")
+            | ("title" in row and row.title == "Sales Agent")
+        )
+        else False,
+        **GRID_DEFAULTS,
+    )
+
+    return dict(grid=grid)
+```
+
+Now we've customized which fields are shown on different actions and set defaults on fields 
+even if they don't appear on the form.
 [back to top](#crud)
 
 ## Handling Field Defaults
 
+[back to top](#crud)
+
+## Custom Forms
+The goal of this exercise is to provide a custom details form for our customer CRUD. This
+will require a special template. 
+
+First, in our controller we need to change the name of the template from 
+grid.html to customer_grid.html. That is done on the @action.uses() line.
+
+Then we need to create our new template and paste in the appropriate code.
+
+Create a template in the templates directory called customer_grid.html. The type or copy 
+in the following.
+
+```html
+[[extend 'layout.html']]
+[[if grid.action == 'details': ]]
+    [[form = grid.render() ]]
+    [[=form.custom.begin ]]
+    <div class="card mb-1">
+        <div class="card-header">
+            <div class="card-header-title">Customer Details</div>
+        </div>
+        <div class="card-content">
+            [[for field in form.table: ]]
+                [[if field.readable and field.name != 'id': ]]
+                    [[=form.custom.widgets[field.name] ]]
+                [[pass ]]
+            [[pass ]]
+        </div>
+    </div>
+    [[=form.custom.submit ]]
+    [[=form.custom.end ]]
+[[else: ]]
+    [[=grid.render()]]
+[[pass ]]
+```
+This example points out how easy it is to create a completely custom visual layout for your
+auto-generated forms. A few things to note.
+
+- we're checking the grid action to see what is being displayed on the page
+- if it is the details page, then show with our custom html
+- if not details then use the standard grid formatting
+
+I don't like the word 'Submit' on the submit button in this case. Let's change that.
+
+We can change the value of the submit button based on the current action. This brings up 
+another thing to know about working with the grid. There are a number of parameters you can 
+supply on grid instantiation (refer to the online docs for a list). When a grid is instantiated,
+it automatically calls the 'process' method which sets everything up to be rendered by 
+the template. However, there are a handful of other settings that can be changed that can 
+affect how the grid is displayed. Since you can't specify them on instantiation, you want 
+to delay the processing of the grid until you've set your additional parameters. You do this
+by setting `auto_process=False` when instantiating the grid. Then, set your additional 
+parameters and then call `grid.process()`.
+
+Yes, that is a lot to take in. Here is how you can change the text on the Submit button 
+for the details action.
+```python
+@action("crud", method=["POST", "GET"])
+@action("crud/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "customer_grid.html",
+)
+def crud(path=None):
+    if path and path.split("/")[0] == "edit":
+        # we're going to build or process the edit form
+        db.customer.name.writable = False
+    elif path and path.split("/")[0] == "details":
+        db.customer.country.readable = False
+        db.customer.district.readable = False
+    elif path and path.split("/")[0] == "new":
+        db.customer.title.default = "President"
+        db.customer.country.default = "United States"
+        north_district = db(db.district.name == "North").select().first()
+        db.customer.district.default = north_district.id
+        db.customer.district.readable = False
+        db.customer.district.writable = False
+
+    search_queries = [
+        ["name", lambda value: db.customer.name.contains(value)],
+        ["contact", lambda value: db.customer.contact.contains(value)],
+        ["title", lambda value: db.customer.title.contains(value)],
+        ["district", lambda value: db.district.name.contains(value)],
+    ]
+    grid = Grid(
+        path,
+        db.customer,
+        columns=[
+            db.customer.name,
+            db.customer.contact,
+            db.customer.title,
+            db.district.name,
+        ],
+        left=[db.district.on(db.customer.district == db.district.id)],
+        headings=["Name", "Contact", "Title", "District"],
+        search_queries=search_queries,
+        field_id=db.customer.id,
+        details=lambda row: True
+        if (
+            ("customer" in row and row.customer.title == "Owner")
+            | ("title" in row and row.title == "Owner")
+        )
+        else False,
+        editable=lambda row: True
+        if (
+            ("customer" in row and row.customer.title != "Owner")
+            | ("title" in row and row.title != "Owner")
+        )
+        else False,
+        deletable=lambda row: True
+        if (
+            ("customer" in row and row.customer.title == "Sales Agent")
+            | ("title" in row and row.title == "Sales Agent")
+        )
+        else False,
+        auto_process=False,
+        **GRID_DEFAULTS,
+    )
+
+    grid.param.details_submit_value = "Done"
+    grid.process()
+
+    return dict(grid=grid)
+```
+It's really pretty simple once you know what is available. Here is a list of the param's
+(and their default values) that you can set after instantiation but before calling `grid.process()`.
+
+- new_sidecar=None
+- new_submit_value=None
+- new_action_button_text="New"
+- details_sidecar=None
+- details_submit_value=None
+- details_action_button_text="Details"
+- edit_sidecar=None
+- edit_submit_value=None
+- edit_action_button_text="Edit"
+- delete_action_button_text="Delete"
+
+In py4web form terminology, a 'sidecar' is an element that you can place next to the 
+submit button on a form. You'll see it commonly used to provide a 'Cancel' button to 
+back out of a table maintenance page. So, for each type of form, you can provide a 
+different element to appear next to the Submit button.
+
+The xxx_submit_value, as you have already seen, allows you to change the text that
+appears on the submit button for each of the different actions.
+
+The xxx_action_button_text allows you to override the default text that py4web places 
+on the standard action buttons.
 
 
 [Back to Index](../README.md)
