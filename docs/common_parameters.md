@@ -138,11 +138,12 @@ grid = Grid(
     **GRID_DEFAULTS,
 )
 ```
-Then, we define our validation method:
+Then, we define our validation method.  
 ```python
 def no_more_than_8_districts(form):
-    if len(db(db.district.id > 0).select()) >= 8:
-        form.errors["name"] = "Too many districts, can only have 8."
+    if not form.vars.get("id"):
+        if len(db(db.district.id > 0).select()) >= 8:
+            form.errors["name"] = "Too many districts, can only have 8."
 ```
 
 [back to top](#commonly-used-parameters)

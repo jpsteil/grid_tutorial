@@ -17,7 +17,7 @@ def index():
     db,
     "grid.html",
 )
-def districts(path=None):
+def basic_grid(path=None):
     grid = Grid(
         path,
         db.district,
@@ -33,8 +33,9 @@ def districts(path=None):
 
 
 def no_more_than_8_districts(form):
-    if len(db(db.district.id > 0).select()) >= 8:
-        form.errors["name"] = "Too many districts, can only have 8."
+    if not form.vars.get("id"):
+        if len(db(db.district.id > 0).select()) >= 8:
+            form.errors["name"] = "Too many districts, can only have 8."
 
 
 @action("columns", method=["POST", "GET"])

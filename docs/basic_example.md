@@ -27,7 +27,7 @@ Next we'll create a controller method to handle the basic_grid endpoint to the c
     db,
     "grid.html",
 )
-def districts(path=None):
+def basic_grid(path=None):
     grid = Grid(
         path,
         db.district,
