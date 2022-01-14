@@ -3,17 +3,17 @@ The py4web grid supports Create/Read/Update/Delete operations (referred to as Ac
 
 In this section we'll explore different ways to manage how your CRUD operations take place.
 
-- [Simple Access Control](#simple_access_control)
-- [Condition based Access Control](#condition_based_access_control)
-- [Row based Access Control](#row_based_access_control)
+- [Simple Access Control](#simple-access-control)
+- [Condition based Access Control](#condition-based-access-control)
+- [Row based Access Control](#row-based-access-control)
 
 We'll then look at how to manage which fields appear on your CRUD forms.
 
-- [Managing Fields](#managing_fields)
+- [Managing Fields](#managing-fields)
 
 Finally we'll look at how to provide defaults to read-only fields that may or may not appear on your CRUD forms.
 
-- [Handling Field Defaults](#handling_field_defaults)
+- [Handling Field Defaults](#handling-field-defaults)
 
 For our CRUD examples we'll be creating CRUD forms over the customer table. No changes to the model are necessary.
 
