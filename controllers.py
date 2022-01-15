@@ -1,6 +1,6 @@
 from yatl import XML
 
-from py4web import action
+from py4web import action, URL
 from py4web.utils.grid import Grid
 from .common import unauthenticated, session, db, GRID_DEFAULTS
 
@@ -179,3 +179,48 @@ def can_user_access(action, group_number):
         if group_number in [7]:
             return True
     return False
+
+
+@action("action_buttons", method=["POST", "GET"])
+@action("action_buttons/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "grid.html",
+)
+def action_buttons(path=None):
+    pre_action_buttons = [GridActionButton(url=URL('sales_report'),
+                                           text='Sales Report',
+                                           icon='fa-file-pdf',
+                                           message='Build Sales Report?',
+                                           append_id=True)]
+    grid = Grid(
+        path,
+        db.product,
+        columns=[db.product.name, db.product.quantity_per_unit, db.product.unit_price, db.product.reorder_level],
+        orderby=db.product.name,
+        pre_action_buttons=pre_action_buttons,
+        **GRID_DEFAULTS,
+    )
+
+    return dict(grid=grid)
+
+class GridActionButton:
+    def __init__(
+        self,
+        url,
+        text=None,
+        icon=None,
+        additional_classes="",
+        message="",
+        append_id=False,
+        ignore_attribute_plugin=False,
+    ):
+        self.url = url
+        self.text = text
+        self.icon = icon
+        self.additional_classes = additional_classes
+        self.message = message
+        self.append_id = append_id
+        self.ignore_attribute_plugin = ignore_attribute_plugin
+
