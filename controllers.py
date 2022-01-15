@@ -189,21 +189,27 @@ def can_user_access(action, group_number):
     "grid.html",
 )
 def action_buttons(path=None):
-    pre_action_buttons = [GridActionButton(url=URL('sales_report'),
-                                           text='Sales Report',
-                                           icon='fa-file-pdf',
-                                           message='Build Sales Report?',
-                                           append_id=True)]
+    pre_action_buttons = [lambda row: (GridActionButton(url=URL('reorder'),
+                                           text=f'Reorder {row.name}',
+                                           icon='fa-redo',
+                                           message=f'Do you want to reorder {row.name}?',
+                                           append_id=True)) if row.in_stock <= row.reorder_level else None]
+
     grid = Grid(
         path,
         db.product,
-        columns=[db.product.name, db.product.quantity_per_unit, db.product.unit_price, db.product.reorder_level],
+        columns=[db.product.name,
+                 db.product.quantity_per_unit,
+                 db.product.unit_price,
+                 db.product.in_stock,
+                 db.product.reorder_level],
         orderby=db.product.name,
         pre_action_buttons=pre_action_buttons,
         **GRID_DEFAULTS,
     )
 
     return dict(grid=grid)
+
 
 class GridActionButton:
     def __init__(
@@ -223,4 +229,3 @@ class GridActionButton:
         self.message = message
         self.append_id = append_id
         self.ignore_attribute_plugin = ignore_attribute_plugin
-

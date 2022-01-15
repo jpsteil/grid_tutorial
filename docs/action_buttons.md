@@ -78,7 +78,7 @@ The _make_action_button method already supports these parameters. They need to b
 [back to top](#action-buttons)
 
 ## Simple Action Button
-For this example we're going to build a grid over the product table and include a pre action button that will build a sales report for the user.
+For this example we're going to build a grid over the product table and include a pre action button that will call the product reorder function.
 
 Add the following to controllers.py.
 
@@ -91,17 +91,18 @@ Add the following to controllers.py.
     "grid.html",
 )
 def action_buttons(path=None):
-    pre_action_buttons = [GridActionButton(url=URL('sales_report'),
-                                           text='Sales Report',
-                                           icon='fa-file-pdf',
-                                           message='Build Sales Report?',
+    pre_action_buttons = [GridActionButton(url=URL('reorder'),
+                                           text=f'Reorder',
+                                           icon='fa-redo',
+                                           message='Do you want to reorder this product',
                                            append_id=True)]
     grid = Grid(
         path,
         db.product,
-        columns=[db.product.name, 
-                 db.product.quantity_per_unit, 
-                 db.product.unit_price, 
+        columns=[db.product.name,
+                 db.product.quantity_per_unit,
+                 db.product.unit_price,
+                 db.product.in_stock,
                  db.product.reorder_level],
         orderby=db.product.name,
         pre_action_buttons=pre_action_buttons,
@@ -129,23 +130,128 @@ class GridActionButton:
         self.append_id = append_id
         self.ignore_attribute_plugin = ignore_attribute_plugin
 ```
-Be sure the you add URL to the imports 
+Be sure to add URL to the imports 
 ```python
 from py4web import action, URL
 ```
 
-Now you've added a simple pre action button to your grid and provided a popup confirmation message.
+Now you've added a simple pre action button to your grid and provided a popup confirmation message. Navigate to the Action Buttons option in your application to see the button added.
 
 [back to top](#action-buttons)
 
 ## Advanced Action Buttons with lambda
+Building upon the previous example we're going to add the product name to the action button text. This will demonstrate the use of lambda functions in building your action button.
+
+```python
+@action("action_buttons", method=["POST", "GET"])
+@action("action_buttons/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "grid.html",
+)
+def action_buttons(path=None):
+    pre_action_buttons = [lambda row: GridActionButton(url=URL('reorder'),
+                                           text=f'Reorder {row.name}',
+                                           icon='fa-redo',
+                                           message=f'Do you want to reorder {row.name}?',
+                                           append_id=True)]
+    grid = Grid(
+        path,
+        db.product,
+        columns=[db.product.name,
+                 db.product.quantity_per_unit,
+                 db.product.unit_price,
+                 db.product.in_stock,
+                 db.product.reorder_level],
+        orderby=db.product.name,
+        pre_action_buttons=pre_action_buttons,
+        **GRID_DEFAULTS,
+    )
+
+    return dict(grid=grid)
+
+
+class GridActionButton:
+    def __init__(
+        self,
+        url,
+        text=None,
+        icon=None,
+        additional_classes="",
+        message="",
+        append_id=False,
+        ignore_attribute_plugin=False,
+    ):
+        self.url = url
+        self.text = text
+        self.icon = icon
+        self.additional_classes = additional_classes
+        self.message = message
+        self.append_id = append_id
+        self.ignore_attribute_plugin = ignore_attribute_plugin
+```
+
+Refresh your page and now the product name has been added to the button text and to the popup confirmation message.
 
 [back to top](#action-buttons)
 
 ## Conditional Action Buttons
+Going one step further we'll now hide or show the pre action button based on some criteria in the row.
+```python
+@action("action_buttons", method=["POST", "GET"])
+@action("action_buttons/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "grid.html",
+)
+def action_buttons(path=None):
+    pre_action_buttons = [lambda row: (GridActionButton(url=URL('reorder'),
+                                           text=f'Reorder {row.name}',
+                                           icon='fa-redo',
+                                           message=f'Do you want to reorder {row.name}?',
+                                           append_id=True)) if row.in_stock <= row.reorder_level else None]
+    grid = Grid(
+        path,
+        db.product,
+        columns=[db.product.name,
+                 db.product.quantity_per_unit,
+                 db.product.unit_price,
+                 db.product.in_stock,
+                 db.product.reorder_level],
+        orderby=db.product.name,
+        pre_action_buttons=pre_action_buttons,
+        **GRID_DEFAULTS,
+    )
+
+    return dict(grid=grid)
+
+
+class GridActionButton:
+    def __init__(
+        self,
+        url,
+        text=None,
+        icon=None,
+        additional_classes="",
+        message="",
+        append_id=False,
+        ignore_attribute_plugin=False,
+    ):
+        self.url = url
+        self.text = text
+        self.icon = icon
+        self.additional_classes = additional_classes
+        self.message = message
+        self.append_id = append_id
+        self.ignore_attribute_plugin = ignore_attribute_plugin
+```
+Refresh the page again and now the Reorder button only appears if the in stock level falls below the reorder level.
 
 [back to top](#action-buttons)
 
+As you can see you have great flexibility in building action buttons. Couple this with the capabilities of the standard action buttons and you have an easy to use grid control with no javascript.
 
 
 [Back to Index](../README.md)
