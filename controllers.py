@@ -1,7 +1,7 @@
 from yatl import XML
 
 from py4web import action, URL
-from py4web.utils.grid import Grid
+from py4web.utils.grid import Grid, Column
 from .common import unauthenticated, session, db, GRID_DEFAULTS
 
 
@@ -229,3 +229,73 @@ class GridActionButton:
         self.message = message
         self.append_id = append_id
         self.ignore_attribute_plugin = ignore_attribute_plugin
+
+
+@action("advanced_columns", method=["POST", "GET"])
+@action("advanced_columns/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "customer_grid.html",
+)
+def advanced_columns(path=None):
+    if path and path.split("/")[0] == "edit":
+        # we're going to build or process the edit form
+        db.customer.name.writable = False
+    elif path and path.split("/")[0] == "details":
+        db.customer.country.readable = False
+        db.customer.district.readable = False
+    elif path and path.split("/")[0] == "new":
+        db.customer.title.default = "President"
+        db.customer.country.default = "United States"
+        north_district = db(db.district.name == "North").select().first()
+        db.customer.district.default = north_district.id
+        db.customer.district.readable = False
+        db.customer.district.writable = False
+
+    search_queries = [
+        ["name", lambda value: db.customer.name.contains(value)],
+        ["contact", lambda value: db.customer.contact.contains(value)],
+        ["title", lambda value: db.customer.title.contains(value)],
+        ["district", lambda value: db.district.name.contains(value)],
+    ]
+    grid = Grid(
+        path,
+        db.customer,
+        columns=[
+            Column('name',
+                   represent=lambda row: XML(f'{row.customer.name}<')),
+            db.customer.contact,
+            db.customer.title,
+            db.district.name,
+        ],
+        left=[db.district.on(db.customer.district == db.district.id)],
+        headings=["Name", "Contact", "Title", "District"],
+        search_queries=search_queries,
+        field_id=db.customer.id,
+        details=lambda row: True
+        if (
+            ("customer" in row and row.customer.title == "Owner")
+            | ("title" in row and row.title == "Owner")
+        )
+        else False,
+        editable=lambda row: True
+        if (
+            ("customer" in row and row.customer.title != "Owner")
+            | ("title" in row and row.title != "Owner")
+        )
+        else False,
+        deletable=lambda row: True
+        if (
+            ("customer" in row and row.customer.title == "Sales Agent")
+            | ("title" in row and row.title == "Sales Agent")
+        )
+        else False,
+        auto_process=False,
+        **GRID_DEFAULTS,
+    )
+
+    grid.param.details_submit_value = "Done"
+    grid.process()
+
+    return dict(grid=grid)
