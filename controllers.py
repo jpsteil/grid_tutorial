@@ -239,63 +239,28 @@ class GridActionButton:
     "customer_grid.html",
 )
 def advanced_columns(path=None):
-    if path and path.split("/")[0] == "edit":
-        # we're going to build or process the edit form
-        db.customer.name.writable = False
-    elif path and path.split("/")[0] == "details":
-        db.customer.country.readable = False
-        db.customer.district.readable = False
-    elif path and path.split("/")[0] == "new":
-        db.customer.title.default = "President"
-        db.customer.country.default = "United States"
-        north_district = db(db.district.name == "North").select().first()
-        db.customer.district.default = north_district.id
-        db.customer.district.readable = False
-        db.customer.district.writable = False
-
-    search_queries = [
-        ["name", lambda value: db.customer.name.contains(value)],
-        ["contact", lambda value: db.customer.contact.contains(value)],
-        ["title", lambda value: db.customer.title.contains(value)],
-        ["district", lambda value: db.district.name.contains(value)],
-    ]
     grid = Grid(
         path,
         db.customer,
         columns=[
             Column('name',
-                   represent=lambda row: XML(f'{row.customer.name}<')),
-            db.customer.contact,
-            db.customer.title,
+                   represent=lambda row: XML(f'{row.customer.name}'
+                                             f'<div>{row.customer.address}</div>'
+                                             f'<div>{row.customer.city}, {row.customer.region} {row.customer.postal_code}</div>'
+                                             f'<div>{row.customer.country}</div>'),
+                   required_fields=[db.customer.name],
+                   orderby=db.customer.name),
+            Column('contact',
+                   represent=lambda row: XML(f"{row.customer.contact}"
+                                             f"<div>{row.customer.title}</div>"),
+                   orderby=db.customer.contact,
+                   td_class_style='grid-cell-type-decimal'),
             db.district.name,
         ],
+        headings=['NAME', 'CONTACT', 'DISTRICT'],
         left=[db.district.on(db.customer.district == db.district.id)],
-        headings=["Name", "Contact", "Title", "District"],
-        search_queries=search_queries,
         field_id=db.customer.id,
-        details=lambda row: True
-        if (
-            ("customer" in row and row.customer.title == "Owner")
-            | ("title" in row and row.title == "Owner")
-        )
-        else False,
-        editable=lambda row: True
-        if (
-            ("customer" in row and row.customer.title != "Owner")
-            | ("title" in row and row.title != "Owner")
-        )
-        else False,
-        deletable=lambda row: True
-        if (
-            ("customer" in row and row.customer.title == "Sales Agent")
-            | ("title" in row and row.title == "Sales Agent")
-        )
-        else False,
-        auto_process=False,
         **GRID_DEFAULTS,
     )
-
-    grid.param.details_submit_value = "Done"
-    grid.process()
 
     return dict(grid=grid)

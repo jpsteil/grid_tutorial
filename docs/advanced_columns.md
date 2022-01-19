@@ -1,6 +1,6 @@
 # Advanced Columns
 
-You can build complex grids with py4web using a table (or query) and specifying the columns from your database that will appear in the grid. This is what the web2py grid did very well. One of the features that sets the py4web grid apart from web2py is the ability to define custom Columns. With py4web custom grid columns, you have complete control over the data/elements that appear in your grid.
+You can build complex grids with py4web using a table (or query) and specifying the columns from your database that will appear in the grid. This is what the web2py SQLFORM.grid did very well. One of the features that sets the py4web grid apart from web2py is the ability to define custom Columns. With py4web custom grid columns, you have complete control over the data/elements that appear in your grid.
 
 Let's take a look at the `columns` parameter that we pass to the Grid call.
 
@@ -43,7 +43,7 @@ When a database field is supplied in the `columns` list, that field is added to 
 #### orderby
 The py4web grid does its sorting in the SQL statement passed to the database. Since the idea of custom columns is to show data in a way that doesn't come directly from the database, the grid doesn't know what logic to use when the user clicks on the column heading to sort. 
 
-The `orderby` parameter is a string or list of database fields that will be passed to the SQL statement when the user clicks on the column heading to sort.
+The `orderby` parameter is a database field that will be passed to the SQL statement `ORDER BY` clause when the user clicks on the column heading to sort.
 
 #### td_class_style
 The `td_class_style` parameter is used to provide style to your column. If you recall from the [GridClassStyle](gridclassstyle.md) section, you can have custom styling done on your column. The `td_class_style` accepts a string to be used as the key to the `grid_class_style` of your grid to retrieve the Classes and or Styles to apply to this column. We will see examples of this later.
@@ -51,17 +51,141 @@ The `td_class_style` parameter is used to provide style to your column. If you r
 [back to top](#advanced-columns)
 
 ## Creating a Multi-Line cell
-For our Advanced Column examples we're going to build upon the customer grid we started in the [CRUD](crud.md) section. We are going to modify that grid to add the address and city to the name column, putting them each on their own line.
+For our Advanced Column examples we're going to build upon the customer grid we started in the [CRUD](crud.md) section. We are going to modify that grid to add the address and city, region, postal code and country to the name column, putting them each on their own line (city, region and postal code will be grouped on one line).
 
 Copy the code below and add it to controllers.py.
+```python
+@action("advanced_columns", method=["POST", "GET"])
+@action("advanced_columns/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "customer_grid.html",
+)
+def advanced_columns(path=None):
+    grid = Grid(
+        path,
+        db.customer,
+        columns=[
+            Column('name',
+                   represent=lambda row: XML(f'{row.customer.name}'
+                                             f'<div>{row.customer.address}</div>'
+                                             f'<div>{row.customer.city}, {row.customer.region} {row.customer.postal_code}</div>'
+                                             f'<div>{row.customer.country}</div>')),
+            Column('contact',
+                   represent=lambda row: XML(f"{row.customer.contact}"
+                                             f"<div>{row.customer.title}</div>")),
+            db.district.name,
+        ],
+        headings=['NAME', 'CONTACT', 'DISTRICT'],
+        left=[db.district.on(db.customer.district == db.district.id)],
+        field_id=db.customer.id,
+        **GRID_DEFAULTS,
+    )
+
+    return dict(grid=grid)
+```
+Notice that now we're using the Column class from grid.py to define our name and contact columns. The district column is still derived just from the database field.
+
+NOTE: We've stripped out some functionality that we implemented earlier just to keep the examples focused.
+
+A couple of things to note.
+
+1. We didn't need to add requires_fields because the fields are all coming from the primary table. Had we needed fields from a referenced table, we would need to specify them.
+2. The Name and Contact fields are not sortable.
+
+Let's add the ability to sort by our custom columns by clicking on the column header.
 
 ```python
+@action("advanced_columns", method=["POST", "GET"])
+@action("advanced_columns/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "customer_grid.html",
+)
+def advanced_columns(path=None):
+    grid = Grid(
+        path,
+        db.customer,
+        columns=[
+            Column('name',
+                   represent=lambda row: XML(f'{row.customer.name}'
+                                             f'<div>{row.customer.address}</div>'
+                                             f'<div>{row.customer.city}, {row.customer.region} {row.customer.postal_code}</div>'
+                                             f'<div>{row.customer.country}</div>'),
+                   orderby=db.customer.name),
+            Column('contact',
+                   represent=lambda row: XML(f"{row.customer.contact}"
+                                             f"<div>{row.customer.title}</div>"),
+                   orderby=db.customer.contact),
+            db.district.name,
+        ],
+        headings=['NAME', 'CONTACT', 'DISTRICT'],
+        left=[db.district.on(db.customer.district == db.district.id)],
+        field_id=db.customer.id,
+        **GRID_DEFAULTS,
+    )
 
+    return dict(grid=grid)
 ```
+Adding the `orderby` parameter allows us to specify a field to sort by when the column header is clicked.
 
 [back to top](#advanced-columns)
 
 ## Custom Styling
+The py4web grid has it's own system to determine how to style a column. When using Custom Columns the default grid styling mechanisms don't help out much. The `td_class_style` parameter can be used to tell the grid how to style a column. The GridClassStyle of the grid defines keys that can translated into classes and styles. There is a subset of keys that would commonly use in a custom Column to help style your column.  They are:
+
+- "grid-cell-type-string"
+- "grid-cell-type-text"
+- "grid-cell-type-boolean"
+- "grid-cell-type-float"
+- "grid-cell-type-decimal"
+- "grid-cell-type-int"
+- "grid-cell-type-date"
+- "grid-cell-type-time"
+- "grid-cell-type-datetime"
+- "grid-cell-type-upload"
+- "grid-cell-type-list"
+- "grid-cell-type-id"
+
+In you custom Column you can set `td_class_style="grid-cell-type-decimal"` to have the grid format the cell like it would a decimal value. In this case it will justify the text to the right as seen here with the Contact column.
+```python
+@action("advanced_columns", method=["POST", "GET"])
+@action("advanced_columns/<path:path>", method=["POST", "GET"])
+@action.uses(
+    session,
+    db,
+    "customer_grid.html",
+)
+def advanced_columns(path=None):
+    grid = Grid(
+        path,
+        db.customer,
+        columns=[
+            Column('name',
+                   represent=lambda row: XML(f'{row.customer.name}'
+                                             f'<div>{row.customer.address}</div>'
+                                             f'<div>{row.customer.city}, {row.customer.region} {row.customer.postal_code}</div>'
+                                             f'<div>{row.customer.country}</div>'),
+                   required_fields=[db.customer.name],
+                   orderby=db.customer.name),
+            Column('contact',
+                   represent=lambda row: XML(f"{row.customer.contact}"
+                                             f"<div>{row.customer.title}</div>"),
+                   orderby=db.customer.contact,
+                   td_class_style='grid-cell-type-decimal'),
+            db.district.name,
+        ],
+        headings=["NAME", "CONTACT", "DISTRICT"],
+        left=[db.district.on(db.customer.district == db.district.id)],
+        field_id=db.customer.id,
+        **GRID_DEFAULTS,
+    )
+
+    return dict(grid=grid)
+```
+It doesn't make much sense to do that here, but at least you can see how it can be used. 
 
 [back to top](#advanced-columns)
 
