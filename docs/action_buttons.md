@@ -1,9 +1,9 @@
 # Action Buttons
-Action buttons perform an action on a specific row. The only exception is the New action button which is intended to create a new record for your grid.
+Action buttons perform an action on a row. The exception is the New action button which will create a new record for your grid.
 
-There are three action buttons that are available to you on every grid and we've already covered how you can enable or disable them.
+There are three action buttons available to you on every grid and we've already covered how you can enable or disable them.
 
-py4web grid also allows you to add your own action buttons before or after the standard action buttons that appear on your grid. On grid instantiation the pre_action_buttons and post_action_buttons parameters accept a list of action button objects. When the grid is then displayed, this action button objects will be converted to html element that are display either before (pre) or after (post) the standard action buttons.
+py4web grid also allows you to add your own action buttons before or after the standard action buttons that appear on your grid. On grid instantiation the pre_action_buttons and post_action_buttons parameters accept a list of action button objects. When the grid is then displayed, these action button objects will be converted to html elements that are display either before (pre) or after (post) the standard action buttons.
 
 NOTE: it is acceptable to disable all three standard action buttons and provide your own action buttons in their place.
 
@@ -15,7 +15,7 @@ This section will explore the different options for creating your own action but
 - [Conditional Action Buttons](#conditional-action-buttons)
 
 ## Defining the Action Button object
-The py4web grid does not include a sample action button object. But, here is the signature that is expected of an action button object.
+The py4web grid does not include a sample action button object. But, here is a sample class with the expected signature.
 
 ```python
 class GridActionButton:

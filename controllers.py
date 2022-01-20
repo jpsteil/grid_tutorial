@@ -189,20 +189,30 @@ def can_user_access(action, group_number):
     "grid.html",
 )
 def action_buttons(path=None):
-    pre_action_buttons = [lambda row: (GridActionButton(url=URL('reorder'),
-                                           text=f'Reorder {row.name}',
-                                           icon='fa-redo',
-                                           message=f'Do you want to reorder {row.name}?',
-                                           append_id=True)) if row.in_stock <= row.reorder_level else None]
+    pre_action_buttons = [
+        lambda row: (
+            GridActionButton(
+                url=URL("reorder"),
+                text=f"Reorder {row.name}",
+                icon="fa-redo",
+                message=f"Do you want to reorder {row.name}?",
+                append_id=True,
+            )
+        )
+        if row.in_stock <= row.reorder_level
+        else None
+    ]
 
     grid = Grid(
         path,
         db.product,
-        columns=[db.product.name,
-                 db.product.quantity_per_unit,
-                 db.product.unit_price,
-                 db.product.in_stock,
-                 db.product.reorder_level],
+        columns=[
+            db.product.name,
+            db.product.quantity_per_unit,
+            db.product.unit_price,
+            db.product.in_stock,
+            db.product.reorder_level,
+        ],
         orderby=db.product.name,
         pre_action_buttons=pre_action_buttons,
         **GRID_DEFAULTS,
@@ -243,21 +253,28 @@ def advanced_columns(path=None):
         path,
         db.customer,
         columns=[
-            Column('name',
-                   represent=lambda row: XML(f'{row.customer.name}'
-                                             f'<div>{row.customer.address}</div>'
-                                             f'<div>{row.customer.city}, {row.customer.region} {row.customer.postal_code}</div>'
-                                             f'<div>{row.customer.country}</div>'),
-                   required_fields=[db.customer.name],
-                   orderby=db.customer.name),
-            Column('contact',
-                   represent=lambda row: XML(f"{row.customer.contact}"
-                                             f"<div>{row.customer.title}</div>"),
-                   orderby=db.customer.contact,
-                   td_class_style='grid-cell-type-decimal'),
+            Column(
+                "name",
+                represent=lambda row: XML(
+                    f"{row.customer.name}"
+                    f"<div>{row.customer.address}</div>"
+                    f"<div>{row.customer.city}, {row.customer.region} {row.customer.postal_code}</div>"
+                    f"<div>{row.customer.country}</div>"
+                ),
+                required_fields=[db.customer.name],
+                orderby=db.customer.name,
+            ),
+            Column(
+                "contact",
+                represent=lambda row: XML(
+                    f"{row.customer.contact}" f"<div>{row.customer.title}</div>"
+                ),
+                orderby=db.customer.contact,
+                td_class_style="grid-cell-type-decimal",
+            ),
             db.district.name,
         ],
-        headings=['NAME', 'CONTACT', 'DISTRICT'],
+        headings=["NAME", "CONTACT", "DISTRICT"],
         left=[db.district.on(db.customer.district == db.district.id)],
         field_id=db.customer.id,
         **GRID_DEFAULTS,
