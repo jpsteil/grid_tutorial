@@ -13,9 +13,9 @@ def index():
 @action("basic_grid", method=["POST", "GET"])
 @action("basic_grid/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def basic_grid(path=None):
     grid = Grid(
@@ -41,9 +41,9 @@ def no_more_than_8_districts(form):
 @action("columns", method=["POST", "GET"])
 @action("columns/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def columns(path=None):
     grid = Grid(
@@ -66,9 +66,9 @@ def columns(path=None):
 @action("search", method=["POST", "GET"])
 @action("search/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def search(path=None):
     search_queries = [
@@ -99,9 +99,9 @@ def search(path=None):
 @action("crud", method=["POST", "GET"])
 @action("crud/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "customer_grid.html",
     session,
     db,
-    "customer_grid.html",
 )
 def crud(path=None):
     if path and path.split("/")[0] == "edit":
@@ -184,9 +184,9 @@ def can_user_access(action, group_number):
 @action("action_buttons", method=["POST", "GET"])
 @action("action_buttons/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def action_buttons(path=None):
     pre_action_buttons = [
@@ -244,9 +244,9 @@ class GridActionButton:
 @action("advanced_columns", method=["POST", "GET"])
 @action("advanced_columns/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "customer_grid.html",
     session,
     db,
-    "customer_grid.html",
 )
 def advanced_columns(path=None):
     grid = Grid(
