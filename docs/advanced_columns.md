@@ -191,6 +191,26 @@ It doesn't make much sense to do that here, but at least you can see how it can 
 
 ## Other HTML elements
 
+Another feature of the Grid is the ability to insert images and other html elements in your grid display. A good example of this can be seen in the included examples application under "Grid (no vue.js)". Click the example button, and you can see an example with a link in the first column and a colored dot in the third.
+
+Let's make a fancy grid out of our data by adding the flag of the customer's country to the grid display.  To do so we'll add the following column to the columns list.
+
+```python
+Column('flag',
+       represent=lambda row:
+       XML(f'<img src="{URL("static", "images/flags",  row.customer.country.lower() + ".png")}" width="68" height="40">') if row.customer.country else ""),
+```
+Assuming we have the png for the country flag in the static/images/flags directory, this will display the flag for the customer country.
+
+We can go a step further and add a link to the map that will navigate to the Wikipedia page for that country. 
+```python
+Column('flag',
+       represent=lambda row:
+       XML(f'<a href="https://www.wikipedia.org/wiki/{row.customer.country}" target="_blank"><img src="{URL("static", "images/flags",  row.customer.country.lower() + ".png")}" width="68" height="40"></a>') if row.customer.country else ""),
+```
+
+This code adds an anchor tag around the image tag and pops open a new tab with the requested Wikipedia page.
+
 [back to top](#advanced-columns)
 
 

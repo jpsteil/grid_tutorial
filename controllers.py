@@ -264,7 +264,10 @@ def advanced_columns(path=None):
                 required_fields=[db.customer.name],
                 orderby=db.customer.name,
             ),
-            Column(
+            Column('flag',
+                   represent=lambda row:
+                   XML(f'<a href="https://www.wikipedia.org/wiki/{row.customer.country}" target="_blank"><img src="{URL("static", "images/flags",  row.customer.country.lower() + ".png")}" width="68" height="40"></a>') if row.customer.country else ""),
+           Column(
                 "contact",
                 represent=lambda row: XML(
                     f"{row.customer.contact}" f"<div>{row.customer.title}</div>"
@@ -277,6 +280,39 @@ def advanced_columns(path=None):
         headings=["NAME", "CONTACT", "DISTRICT"],
         left=[db.district.on(db.customer.district == db.district.id)],
         field_id=db.customer.id,
+        **GRID_DEFAULTS,
+    )
+
+    return dict(grid=grid)
+
+
+@action("advanced_search", method=["POST", "GET"])
+@action("advanced_search/<path:path>", method=["POST", "GET"])
+@action.uses(
+    "grid.html",
+    session,
+    db,
+)
+def search(path=None):
+    search_queries = [
+        ["name", lambda value: db.customer.name.contains(value)],
+        ["contact", lambda value: db.customer.contact.contains(value)],
+        ["title", lambda value: db.customer.title.contains(value)],
+        ["district", lambda value: db.district.name.contains(value)],
+    ]
+
+    grid = Grid(
+        path,
+        db.customer,
+        columns=[
+            db.customer.name,
+            db.customer.contact,
+            db.customer.title,
+            db.district.name,
+        ],
+        left=[db.district.on(db.customer.district == db.district.id)],
+        search_queries=search_queries,
+        headings=["Name", "Contact", "Title", "District"],
         **GRID_DEFAULTS,
     )
 
