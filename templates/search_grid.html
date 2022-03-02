@@ -18,12 +18,4 @@
     });
 [[pass]]
 </script>
-[[if grid.action in ['details', 'edit']:]]
-<div class="columns">
-    <div class="column is-6">
-        [[=grid.render()]]
-    </div>
-</div>
-[[else:]]
-    [[=grid.render()]]
-[[pass]]
+[[=grid.render()]]

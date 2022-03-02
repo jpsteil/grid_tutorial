@@ -198,17 +198,7 @@ Create a file in templates called searchgrid.html and copy the following code in
     });
 [[pass]]
 </script>
-<div class="container">
-    [[if grid.action in ['details', 'edit']:]]
-    <div class="columns">
-        <div class="column is-6">
-            [[=grid.render()]]
-        </div>
-    </div>
-    [[else:]]
-        [[=grid.render()]]
-    [[pass]]
-</div>
+[[=grid.render()]]
 ```
 The javascript in this file is there get the search form field values and submit them back to the py4web grid.
 
