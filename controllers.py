@@ -3,6 +3,8 @@ from yatl import XML
 from py4web import action, URL
 from py4web.utils.grid import Grid, Column
 from .common import unauthenticated, session, db, GRID_DEFAULTS
+from .grid_helpers import GridSearchQuery, GridSearch
+from pydal.validators import IS_NULL_OR, IS_IN_DB, IS_IN_SET
 
 
 @unauthenticated("index", "index.html")
@@ -264,10 +266,15 @@ def advanced_columns(path=None):
                 required_fields=[db.customer.name],
                 orderby=db.customer.name,
             ),
-            Column('flag',
-                   represent=lambda row:
-                   XML(f'<a href="https://www.wikipedia.org/wiki/{row.customer.country}" target="_blank"><img src="{URL("static", "images/flags",  row.customer.country.lower() + ".png")}" width="68" height="40"></a>') if row.customer.country else ""),
-           Column(
+            Column(
+                "flag",
+                represent=lambda row: XML(
+                    f'<a href="https://www.wikipedia.org/wiki/{row.customer.country}" target="_blank"><img src="{URL("static", "images/flags",  row.customer.country.lower() + ".png")}" width="68" height="40"></a>'
+                )
+                if row.customer.country
+                else "",
+            ),
+            Column(
                 "contact",
                 represent=lambda row: XML(
                     f"{row.customer.contact}" f"<div>{row.customer.title}</div>"
@@ -289,21 +296,43 @@ def advanced_columns(path=None):
 @action("advanced_search", method=["POST", "GET"])
 @action("advanced_search/<path:path>", method=["POST", "GET"])
 @action.uses(
-    "grid.html",
+    "search_grid.html",
     session,
     db,
 )
-def search(path=None):
+def advanced_search(path=None):
     search_queries = [
-        ["name", lambda value: db.customer.name.contains(value)],
-        ["contact", lambda value: db.customer.contact.contains(value)],
-        ["title", lambda value: db.customer.title.contains(value)],
-        ["district", lambda value: db.district.name.contains(value)],
+        GridSearchQuery(
+            "Filter by District",
+            lambda value: db.customer.district == value,
+            requires=IS_NULL_OR(IS_IN_DB(db, db.district, "%(name)s", zero="..")),
+        ),
+        GridSearchQuery(
+            "Search by title",
+            lambda value: db.customer.title.contains(value),
+            requires=IS_NULL_OR(
+                IS_IN_SET(
+                    [
+                        x.title
+                        for x in db(db.customer.id > 0).select(
+                            db.customer.title, distinct=True, orderby=db.customer.title
+                        )
+                    ]
+                )
+            ),
+        ),
+        GridSearchQuery(
+            "Search by name or contact",
+            lambda value: db.customer.name.contains(value)
+            | db.customer.contact.contains(value),
+        ),
     ]
+
+    search = GridSearch(search_queries, queries=[db.customer.id > 0])
 
     grid = Grid(
         path,
-        db.customer,
+        query=search.query,
         columns=[
             db.customer.name,
             db.customer.contact,
@@ -311,7 +340,8 @@ def search(path=None):
             db.district.name,
         ],
         left=[db.district.on(db.customer.district == db.district.id)],
-        search_queries=search_queries,
+        search_queries=search.search_queries,
+        search_form=search.search_form,
         headings=["Name", "Contact", "Title", "District"],
         **GRID_DEFAULTS,
     )
