@@ -392,7 +392,7 @@ search_queries = [
             IS_IN_SET(
                 [
                     x.title
-                    for x in db(db.customer.id > 0).select(
+                    for x in db(db.customer.title != "").select(
                         db.customer.title, distinct=True, orderby=db.customer.title
                     )
                 ]
