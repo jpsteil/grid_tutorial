@@ -10,7 +10,6 @@ In this section we'll explore a few different search scenarios:
 
 - [GridSearchQuery class](#gridsearchquery-class)
 - [GridSearch Class](#gridsearch-class)
-- [search_grid.html](#search_gridhtml)
 - [Putting it Together - Simple Text Search](#putting-it-together---simple-text-search)
 - [Multiple Search Fields](#multiple-search-fields)
 - [Dropdown List Search](#dropdown-list-search)
@@ -131,10 +130,11 @@ class GridSearch:
                 "_hx-post": request.url,
                 "_hx-target": target_element,
                 "_hx-swap": "innerHTML",
+                "_method": 'GET'
             }
         else:
-            attrs = {}
-
+            attrs = {"_method": 'GET'}
+            
         self.search_form = Form(
             form_fields,
             keep_values=True,
@@ -170,59 +170,16 @@ class GridSearch:
 ```
 The GridSearchQuery and GridSearch classes can be found in the grid_tutorial repo in the grid_helpers.py file.
 
-[back to top](#advanced-search)
-
-## search_grid.html
-The GridSearch helper class will create a py4web search form that will be passed to the grid to handle the search input. At the time of this writing, the py4web form does not support GET operations, so we need some custom javascript to handle submission of the search forms.
-
-Create a file in templates called searchgrid.html and copy the following code into it.
-
-```html
-[extend 'layout.html']]
-<script type="text/javascript">
-[[if grid.action == 'select':]]
-    window.addEventListener("load",function() {
-        var form = document.forms[0];
-        form.addEventListener("submit", function(e1) {
-            e1.preventDefault();
-            var action = new URL(form.action);
-            for (var i = 0; i < form.elements.length; i++) {
-                var e = form.elements[i];
-                if (e.name.substring(0,3) === 'sq_') {
-                    action.searchParams.set(encodeURIComponent(e.name), encodeURIComponent(e.value));
-                }
-            }
-            form.action = action
-            form.submit();
-        });
-    });
-[[pass]]
-</script>
-[[=grid.render()]]
-```
-The javascript in this file is there get the search form field values and submit them back to the py4web grid.
-
-We will be using search_grid.html as our template going forward.
-
-Now that we've seen the GridSearchQuery and GridSearch helper classes as well as the modified search_grid.html, let's put them to use.
+Now that we've introduced the GridSearchQuery and GridSearch helper classes let's put them to use.
 
 [back to top](#advanced-search)
 
 ## Putting it Together - Simple Text Search
-Picking up where we left off with the Basic Search we have the ability to search by Name, Contact, Title or District. But, you have to decide which field you want to search by, and you can't just do a text search over all 4 of them.
+Picking up where we left off with the Basic Search. In that example we have the ability to search by Name, Contact, Title or District. But, you have to decide which field you want to search by, and you can't just do a text search over all 4 of them.
 
 In this exercise we'll create a GridSearchQuery that will accept any text input and filter the results based on that text being in the name, contact, title or district fields.
 
-To start with we're going to change our template from grid.html to search_grid.html.
-
-```python
-@action.uses(
-    "search_grid.html",
-    session,
-    db,
-)
-```
-Next we will set our search queries to a list of GridSearchQuery objects.
+Let's break this down to the individual components. First we set our search queries to a list of GridSearchQuery objects.
 ```python
 search_queries = [
     GridSearchQuery(
@@ -234,7 +191,7 @@ search_queries = [
 ]
 ```
 Here we're using the first 2 parameters of the GridSearchQuery to specify that:
-1. We're want our text to be 'Search by name or contact or title'
+1. We want our text to be 'Search by name or contact or title'
 2. When a value is entered, we call the lambda function to add query elements to the grid query
 
 In this case we're saying that when a value is entered, match it against the name, contact or title and return the rows where the entered value is in one of these three fields.
@@ -245,7 +202,7 @@ Next we'll build the search values to pass to the grid.
 search = GridSearch(search_queries, queries=[db.customer.id > 0])
 ```
 
-Here we pass our search queries and the grid default query to GridSearch and it will return to us an object containing the query, search_query and search_form. We then pass them to the grid.
+Grid search takes the search queries list and the default queries and builds our query, search_queries and search_form to pass to the Grid.
 
 ```python
 grid = Grid(
@@ -271,7 +228,7 @@ Putting it all together, our first advanced search grid controller looks like th
 @action("advanced_search", method=["POST", "GET"])
 @action("advanced_search/<path:path>", method=["POST", "GET"])
 @action.uses(
-    "search_grid.html",
+    "grid.html",
     session,
     db,
 )
@@ -307,7 +264,7 @@ def advanced_search(path=None):
 
 ```
 
-Play around, test different search values.  All previous grid features are still in tact. When you edit or view details of a record, and then return to the grid, the grid remembers your search criteria and your current page.
+Play around, test different search values.  All previous grid features are still intact. When you edit or view details of a record, and then return to the grid, the grid remembers your search criteria and your current page.
 
 We'll continue by adding another field to our search form.
 

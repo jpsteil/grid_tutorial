@@ -109,9 +109,10 @@ class GridSearch:
                 "_hx-post": request.url,
                 "_hx-target": target_element,
                 "_hx-swap": "innerHTML",
+                "_method": 'GET'
             }
         else:
-            attrs = {}
+            attrs = {"_method": 'GET'}
 
         self.search_form = Form(
             form_fields,

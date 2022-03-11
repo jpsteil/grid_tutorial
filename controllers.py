@@ -296,7 +296,7 @@ def advanced_columns(path=None):
 @action("advanced_search", method=["POST", "GET"])
 @action("advanced_search/<path:path>", method=["POST", "GET"])
 @action.uses(
-    "search_grid.html",
+    "grid.html",
     session,
     db,
 )
