@@ -30,9 +30,9 @@ Now, add another controller method. We'll start with the same simple grid concep
 @action("columns", method=["POST", "GET"])
 @action("columns/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def districts(path=None):
     grid = Grid(
@@ -43,16 +43,16 @@ def districts(path=None):
 
     return dict(grid=grid)
 ```
-Now, take a look at http://127.0.0.1:8000/columns. It doesn't look very nice, does it. The functionality is all there, it isn't very easy on the eyes.  Let's fix that by specifying which columns we want to appear in the grid portion.  We can do that with the `columns=[column1, column2]` parameter on the Grid call.
+Now, take a look at http://127.0.0.1:8000/grid_tutorial/columns. It doesn't look very nice, does it. The functionality is all there, it isn't very easy on the eyes.  Let's fix that by specifying which columns we want to appear in the grid portion.  We can do that with the `columns=[column1, column2]` parameter on the Grid call.
 
 For this example lets assume we want to see the name, contact and title fields. We can do that with this code.
 ```python
 @action("columns", method=["POST", "GET"])
 @action("columns/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def districts(path=None):
     grid = Grid(
@@ -71,9 +71,9 @@ Let's add the district field to this display.
 @action("columns", method=["POST", "GET"])
 @action("columns/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def districts(path=None):
     grid = Grid(
@@ -127,9 +127,9 @@ A better solution to this issue is to join the district table and use the name f
 @action("columns", method=["POST", "GET"])
 @action("columns/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def columns(path=None):
     grid = Grid(
@@ -147,9 +147,9 @@ This should look similar. However, there are 2 difference. The first is that the
 @action("columns", method=["POST", "GET"])
 @action("columns/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def columns(path=None):
     grid = Grid(
