@@ -86,9 +86,9 @@ Add the following to controllers.py.
 @action("action_buttons", method=["POST", "GET"])
 @action("action_buttons/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def action_buttons(path=None):
     pre_action_buttons = [GridActionButton(url=URL('reorder'),
@@ -146,9 +146,9 @@ Building upon the previous example we're going to add the product name to the ac
 @action("action_buttons", method=["POST", "GET"])
 @action("action_buttons/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def action_buttons(path=None):
     pre_action_buttons = [lambda row: GridActionButton(url=URL('reorder'),
@@ -202,9 +202,9 @@ Going one step further we'll now hide or show the pre action button based on som
 @action("action_buttons", method=["POST", "GET"])
 @action("action_buttons/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def action_buttons(path=None):
     pre_action_buttons = [lambda row: (GridActionButton(url=URL('reorder'),
