@@ -23,9 +23,9 @@ Next we'll create a controller method to handle the basic_grid endpoint to the c
 @action("basic_grid", method=["POST", "GET"])
 @action("basic_grid/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def basic_grid(path=None):
     grid = Grid(
