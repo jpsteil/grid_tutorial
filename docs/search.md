@@ -5,9 +5,9 @@ For this section we are going to add a new controller with basically the same co
 @action("search", method=["POST", "GET"])
 @action("search/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def search(path=None):
     grid = Grid(
@@ -34,9 +34,9 @@ Here is our new controller
 @action("search", method=["POST", "GET"])
 @action("search/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def search(path=None):
     search_queries = [
