@@ -58,9 +58,9 @@ Copy the code below and add it to controllers.py.
 @action("advanced_columns", method=["POST", "GET"])
 @action("advanced_columns/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "customer_grid.html",
     session,
     db,
-    "customer_grid.html",
 )
 def advanced_columns(path=None):
     grid = Grid(
@@ -100,9 +100,9 @@ Let's add the ability to sort by our custom columns by clicking on the column he
 @action("advanced_columns", method=["POST", "GET"])
 @action("advanced_columns/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "customer_grid.html",
     session,
     db,
-    "customer_grid.html",
 )
 def advanced_columns(path=None):
     grid = Grid(
@@ -154,9 +154,9 @@ In you custom Column you can set `td_class_style="grid-cell-type-decimal"` to ha
 @action("advanced_columns", method=["POST", "GET"])
 @action("advanced_columns/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "customer_grid.html",
     session,
     db,
-    "customer_grid.html",
 )
 def advanced_columns(path=None):
     grid = Grid(
