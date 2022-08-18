@@ -2,6 +2,8 @@
 
 A tutorial to walk through the use and features of the py4web grid.
 
+NOTE:  You can clone this repo which has working examples of each exercise.  Please submit github issues with any problems you find in the walk-thrus.
+
 1. [Introduction](docs/introduction.md)
 2. [Getting started / Styling](docs/getting_started.md)
 3. [The Database](docs/the_database.md)

@@ -314,7 +314,7 @@ def advanced_search(path=None):
                 IS_IN_SET(
                     [
                         x.title
-                        for x in db(db.customer.title != '').select(
+                        for x in db(db.customer.title != "").select(
                             db.customer.title, distinct=True, orderby=db.customer.title
                         )
                     ]
