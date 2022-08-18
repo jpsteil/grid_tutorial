@@ -24,9 +24,9 @@ Let's start by revisiting our customer grid and adding a copy of it to controlle
 @action("crud", method=["POST", "GET"])
 @action("crud/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def crud(path=None):
     search_queries = [
@@ -54,9 +54,9 @@ If we want to disable read access to our customer table, we can set `details=Fal
 @action("crud", method=["POST", "GET"])
 @action("crud/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def crud(path=None):
     search_queries = [
@@ -94,9 +94,9 @@ Update your 'crud' code in controllers.py to match this.
 @action("crud", method=["POST", "GET"])
 @action("crud/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def crud(path=None):
     group_number = 1
@@ -160,9 +160,9 @@ Here is how we'd do that.
 @action("crud", method=["POST", "GET"])
 @action("crud/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def crud(path=None):
     group_number = 7
@@ -236,9 +236,9 @@ There are 2 steps to this. First we need to determine when the grid wants to mak
 @action("crud", method=["POST", "GET"])
 @action("crud/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def crud(path=None):
     if path and path.split("/")[0] == "edit":
@@ -307,9 +307,9 @@ Now, for the details action we aren't going to display the country or district f
 @action("crud", method=["POST", "GET"])
 @action("crud/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def crud(path=None):
     if path and path.split("/")[0] == "edit":
@@ -370,9 +370,9 @@ the district to North. We'll complicate things a bit by not displaying the distr
 @action("crud", method=["POST", "GET"])
 @action("crud/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "grid.html",
     session,
     db,
-    "grid.html",
 )
 def crud(path=None):
     if path and path.split("/")[0] == "edit":
@@ -497,9 +497,9 @@ for the details action.
 @action("crud", method=["POST", "GET"])
 @action("crud/<path:path>", method=["POST", "GET"])
 @action.uses(
+    "customer_grid.html",
     session,
     db,
-    "customer_grid.html",
 )
 def crud(path=None):
     if path and path.split("/")[0] == "edit":
