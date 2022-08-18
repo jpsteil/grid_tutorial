@@ -45,7 +45,7 @@ Then we'll need a template to handle the grid display.  Create file
 [[=grid.render()]]
 ```
 
-Now point your browser to `http://127.0.0.1:8000/basic_grid` (or click on the Basic Grid option on your home page) and you should see a full CRUD capable grid over the district table.
+Now point your browser to `http://127.0.0.1:8000/grid_tutorial/basic_grid` (or click on the Basic Grid option on your home page) and you should see a full CRUD capable grid over the district table.
 
 - Click on the New button to create new records
 - Click Details to see the details of any record
