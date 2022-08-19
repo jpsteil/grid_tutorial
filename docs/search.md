@@ -15,7 +15,7 @@ def search(path=None):
         db.customer,
         columns=[db.customer.name, db.customer.contact, db.customer.title, db.district.name],
         left=[db.district.on(db.customer.district == db.district.id)],
-        headings=['Name', 'Contact', 'Title', "District"],
+        headings=["Name", "Contact", "Title", "District"],
         **GRID_DEFAULTS,
     )
 
@@ -50,7 +50,7 @@ def search(path=None):
         db.customer,
         columns=[db.customer.name, db.customer.contact, db.customer.title, db.district.name],
         left=[db.district.on(db.customer.district == db.district.id)],
-        headings=['Name', 'Contact', 'Title', "District"],
+        headings=["Name", "Contact", "Title", "District"],
         search_queries=search_queries,
         **GRID_DEFAULTS,
     )
