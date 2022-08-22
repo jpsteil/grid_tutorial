@@ -8,7 +8,7 @@ to use Bulma instead of no.css.
 
 By default, forms and grids will use no.css for styling, but we can override that. To use 
 Bulma styling for forms or grids, you first have to import the appropriate class into your 
-python file.
+py4web controller file(s).
 
 ```python
 from py4web.utils.form import Form, FormStyleBulma
@@ -28,7 +28,7 @@ my_grid = Grid(path, tablename, formstyle=FormStyleBulma, grid_class_style=GridC
 ```
 
 As you can see, it can be a bother to have to provide multiple boilerplate options to our grids 
-every time you want to instantiate one. To make this easier we recommend creating  a GRID_DEFAULTS 
+every time you want to instantiate one. To make this easier we recommend creating a GRID_DEFAULTS 
 variable in your common.py file that can be used later to override common defaults on all of 
 my grids (works for forms as well).
 
