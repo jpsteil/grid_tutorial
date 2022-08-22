@@ -153,7 +153,7 @@ First we're going to replace everything in templates/layout.html with the follow
 From the grid_tutorial repo copy the /static/images directory to your application directory. This
 will get all the tutorial icons and such copied to your application.
 
-Next we'll cut and paste the following block into templates/index.html
+Next we'll cut and paste the following block into templates/index.html, replacing everything that is there.
 ```html
 [[extend 'layout.html']]
 
