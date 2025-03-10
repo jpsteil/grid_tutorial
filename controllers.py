@@ -255,6 +255,7 @@ def advanced_columns(path=None):
         path,
         db.customer,
         columns=[
+    
             Column(
                 "name",
                 represent=lambda row: XML(
@@ -263,7 +264,12 @@ def advanced_columns(path=None):
                     f"<div>{row.customer.city}, {row.customer.region} {row.customer.postal_code}</div>"
                     f"<div>{row.customer.country}</div>"
                 ),
-                required_fields=[db.customer.name],
+                required_fields=[db.customer.name,
+                                 db.customer.address,
+                                 db.customer.city,
+                                 db.customer.country,
+                                 db.customer.postal_code,
+                                 db.customer.region,],
                 orderby=db.customer.name,
             ),
             Column(
@@ -273,6 +279,7 @@ def advanced_columns(path=None):
                 )
                 if row.customer.country
                 else "",
+                required_fields=[db.customer.country,]
             ),
             Column(
                 "contact",
@@ -281,17 +288,27 @@ def advanced_columns(path=None):
                 ),
                 orderby=db.customer.contact,
                 td_class_style="grid-cell-type-decimal",
+                required_fields=[db.customer.contact,
+                                 db.customer.title,]
             ),
-            db.district.name,
+            Column(
+                "district",
+                represent=lambda row: XML(
+                    f"{row.district.name}"
+                ),
+                orderby=db.district.name,
+                td_class_style="grid-cell-type-decimal",
+                required_fields=[db.district.name,]
+            ),
+       
         ],
-        headings=["NAME", "CONTACT", "DISTRICT"],
+        headings=["NAME", "FLAG", "CONTACT", "DISTRICT"],
         left=[db.district.on(db.customer.district == db.district.id)],
         field_id=db.customer.id,
         **GRID_DEFAULTS,
     )
 
     return dict(grid=grid)
-
 
 @action("advanced_search", method=["POST", "GET"])
 @action("advanced_search/<path:path>", method=["POST", "GET"])
