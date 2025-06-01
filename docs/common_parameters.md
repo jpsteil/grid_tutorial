@@ -16,7 +16,6 @@ Doing so is each.  Simply add the `orderby=db.district.name` parameter to the Gr
 
 ```python
 grid = Grid(
-    path,
     db.district,
     orderby=db.district.name,
     **GRID_DEFAULTS,
@@ -34,7 +33,6 @@ You can tell the grid to always display the 'id' field by passing `show_id=True`
 
 ```python
 grid = Grid(
-    path,
     db.district,
     show_id=True,
     orderby=db.district.name,
@@ -51,7 +49,6 @@ Sometimes you want to change the number of rows that will be displayed on your p
 This can be done by passing `rows_per_page=5` to the Grid call.
 ```python
 grid = Grid(
-    path,
     db.district,
     orderby=db.district.name,
     show_id=True,
@@ -70,7 +67,6 @@ Let's change the 'id' column headingn to District ID (the grid will always capit
 
 ```python
 grid = Grid(
-    path,
     db.district,
     orderby=db.district.name,
     show_id=True,
@@ -83,7 +79,6 @@ PRO TIP: You can pass html elements to your column headings. For example, you co
 ```python
 from yatl import XML
 grid = Grid(
-    path,
     db.district,
     orderby=db.district.name,
     show_id=True,

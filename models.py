@@ -1,6 +1,7 @@
 """
 This file defines the database models
 """
+
 import datetime
 from decimal import Decimal, ROUND_HALF_UP
 

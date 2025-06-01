@@ -1,7 +1,7 @@
 from yatl import XML
 
-from py4web import action, URL
-from py4web.utils.grid import Grid, Column
+from py4web import action, URL, request
+from py4web.utils.grid import Grid, Column, ActionButton
 from .common import unauthenticated, session, db, GRID_DEFAULTS
 from .grid_helpers import GridSearchQuery, GridSearch
 from pydal.validators import IS_NULL_OR, IS_IN_DB, IS_IN_SET
@@ -12,16 +12,14 @@ def index():
     return dict()
 
 
-@action("basic_grid", method=["POST", "GET"])
-@action("basic_grid/<path:path>", method=["POST", "GET"])
+@action("basic_grid")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def basic_grid(path=None):
+def basic_grid():
     grid = Grid(
-        path,
         db.district,
         orderby=db.district.name,
         show_id=True,
@@ -40,16 +38,14 @@ def no_more_than_8_districts(form):
             form.errors["name"] = "Too many districts, can only have 8."
 
 
-@action("columns", method=["POST", "GET"])
-@action("columns/<path:path>", method=["POST", "GET"])
+@action("columns")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def columns(path=None):
+def columns():
     grid = Grid(
-        path,
         db.customer,
         columns=[
             db.customer.name,
@@ -65,15 +61,14 @@ def columns(path=None):
     return dict(grid=grid)
 
 
-@action("search", method=["POST", "GET"])
-@action("search/<path:path>", method=["POST", "GET"])
+@action("search")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def search(path=None):
-    search_queries = [
+def search():
+    custom_search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
         ["contact", lambda value: db.customer.contact.contains(value)],
         ["title", lambda value: db.customer.title.contains(value)],
@@ -81,7 +76,6 @@ def search(path=None):
     ]
 
     grid = Grid(
-        path,
         db.customer,
         columns=[
             db.customer.name,
@@ -90,7 +84,7 @@ def search(path=None):
             db.district.name,
         ],
         left=[db.district.on(db.customer.district == db.district.id)],
-        search_queries=search_queries,
+        search_queries=custom_search_queries,
         headings=["Name", "Contact", "Title", "District"],
         **GRID_DEFAULTS,
     )
@@ -98,36 +92,35 @@ def search(path=None):
     return dict(grid=grid)
 
 
-@action("crud", method=["POST", "GET"])
-@action("crud/<path:path>", method=["POST", "GET"])
+@action("crud")
 @action.uses(
     "customer_grid.html",
     session,
     db,
 )
-def crud(path=None):
-    if path and path.split("/")[0] == "edit":
-        # we're going to build or process the edit form
-        db.customer.name.writable = False
-    elif path and path.split("/")[0] == "details":
-        db.customer.country.readable = False
-        db.customer.district.readable = False
-    elif path and path.split("/")[0] == "new":
+def crud():
+    mode = request.query.get("mode", "select")
+    if mode == "new":
         db.customer.title.default = "President"
         db.customer.country.default = "United States"
         north_district = db(db.district.name == "North").select().first()
         db.customer.district.default = north_district.id
         db.customer.district.readable = False
         db.customer.district.writable = False
+    elif mode == "edit":
+        # we're going to build or process the edit form
+        db.customer.name.writable = False
+    elif mode == "select" and request.query.get("id"):
+        db.customer.country.readable = False
+        db.customer.district.readable = False
 
-    search_queries = [
+    custom_search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
         ["contact", lambda value: db.customer.contact.contains(value)],
         ["title", lambda value: db.customer.title.contains(value)],
         ["district", lambda value: db.district.name.contains(value)],
     ]
     grid = Grid(
-        path,
         db.customer,
         columns=[
             db.customer.name,
@@ -137,7 +130,7 @@ def crud(path=None):
         ],
         left=[db.district.on(db.customer.district == db.district.id)],
         headings=["Name", "Contact", "Title", "District"],
-        search_queries=search_queries,
+        search_queries=custom_search_queries,
         field_id=db.customer.id,
         details=lambda row: True
         if (
@@ -183,22 +176,20 @@ def can_user_access(action, group_number):
     return False
 
 
-@action("action_buttons", method=["POST", "GET"])
-@action("action_buttons/<path:path>", method=["POST", "GET"])
+@action("action_buttons")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def action_buttons(path=None):
+def action_buttons():
     pre_action_buttons = [
         lambda row: (
-            GridActionButton(
-                url=URL("reorder"),
+            ActionButton(
                 text=f"Reorder {row.name}",
+                url=URL("reorder/{row_id}"),
                 icon="fa-redo",
                 message=f"Do you want to reorder {row.name}?",
-                append_id=True,
             )
         )
         if row.in_stock <= row.reorder_level
@@ -206,7 +197,6 @@ def action_buttons(path=None):
     ]
 
     grid = Grid(
-        path,
         db.product,
         columns=[
             db.product.name,
@@ -223,39 +213,16 @@ def action_buttons(path=None):
     return dict(grid=grid)
 
 
-class GridActionButton:
-    def __init__(
-        self,
-        url,
-        text=None,
-        icon=None,
-        additional_classes="",
-        message="",
-        append_id=False,
-        ignore_attribute_plugin=False,
-    ):
-        self.url = url
-        self.text = text
-        self.icon = icon
-        self.additional_classes = additional_classes
-        self.message = message
-        self.append_id = append_id
-        self.ignore_attribute_plugin = ignore_attribute_plugin
-
-
-@action("advanced_columns", method=["POST", "GET"])
-@action("advanced_columns/<path:path>", method=["POST", "GET"])
+@action("advanced_columns")
 @action.uses(
     "customer_grid.html",
     session,
     db,
 )
-def advanced_columns(path=None):
+def advanced_columns():
     grid = Grid(
-        path,
         db.customer,
         columns=[
-    
             Column(
                 "name",
                 represent=lambda row: XML(
@@ -264,43 +231,48 @@ def advanced_columns(path=None):
                     f"<div>{row.customer.city}, {row.customer.region} {row.customer.postal_code}</div>"
                     f"<div>{row.customer.country}</div>"
                 ),
-                required_fields=[db.customer.name,
-                                 db.customer.address,
-                                 db.customer.city,
-                                 db.customer.country,
-                                 db.customer.postal_code,
-                                 db.customer.region,],
+                required_fields=[
+                    db.customer.name,
+                    db.customer.address,
+                    db.customer.city,
+                    db.customer.country,
+                    db.customer.postal_code,
+                    db.customer.region,
+                ],
                 orderby=db.customer.name,
             ),
             Column(
                 "flag",
                 represent=lambda row: XML(
-                    f'<a href="https://www.wikipedia.org/wiki/{row.customer.country}" target="_blank"><img src="{URL("static", "images/flags",  row.customer.country.lower() + ".png")}" width="68" height="40"></a>'
+                    f'<a href="https://www.wikipedia.org/wiki/{row.customer.country}" target="_blank"><img src="{URL("static", "images/flags", row.customer.country.lower() + ".png")}" width="68" height="40"></a>'
                 )
                 if row.customer.country
                 else "",
-                required_fields=[db.customer.country,]
+                required_fields=[
+                    db.customer.country,
+                ],
             ),
             Column(
                 "contact",
                 represent=lambda row: XML(
-                    f"{row.customer.contact}" f"<div>{row.customer.title}</div>"
+                    f"{row.customer.contact}<div>{row.customer.title}</div>"
                 ),
                 orderby=db.customer.contact,
                 td_class_style="grid-cell-type-decimal",
-                required_fields=[db.customer.contact,
-                                 db.customer.title,]
+                required_fields=[
+                    db.customer.contact,
+                    db.customer.title,
+                ],
             ),
             Column(
                 "district",
-                represent=lambda row: XML(
-                    f"{row.district.name}"
-                ),
+                represent=lambda row: XML(f"{row.district.name}"),
                 orderby=db.district.name,
                 td_class_style="grid-cell-type-decimal",
-                required_fields=[db.district.name,]
+                required_fields=[
+                    db.district.name,
+                ],
             ),
-       
         ],
         headings=["NAME", "FLAG", "CONTACT", "DISTRICT"],
         left=[db.district.on(db.customer.district == db.district.id)],
@@ -310,14 +282,14 @@ def advanced_columns(path=None):
 
     return dict(grid=grid)
 
-@action("advanced_search", method=["POST", "GET"])
-@action("advanced_search/<path:path>", method=["POST", "GET"])
+
+@action("advanced_search")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def advanced_search(path=None):
+def advanced_search():
     search_queries = [
         GridSearchQuery(
             "Filter by District",
@@ -348,7 +320,6 @@ def advanced_search(path=None):
     search = GridSearch(search_queries, queries=[db.customer.id > 0])
 
     grid = Grid(
-        path,
         query=search.query,
         columns=[
             db.customer.name,

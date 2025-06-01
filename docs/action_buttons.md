@@ -15,34 +15,42 @@ This section will explore the different options for creating your own action but
 - [Conditional Action Buttons](#conditional-action-buttons)
 
 ## Defining the Action Button object
-The py4web grid does not include a sample action button object. But, here is a sample class with the expected signature.
+The py4web grid include a sample action button object,
 
 ```python
-class GridActionButton:
+from py4web.utils.grid import ActionButton
+```
+
+
+but you can defined your own as lohng as you have rthese fields:
+
+```python
+
+
+class ActionButton:
     def __init__(
         self,
+        text,
         url,
-        text=None,
         icon=None,
-        additional_classes="",
+        additional_classes=None,
+        override_classes=None,
         message="",
-        append_id=False,
-        ignore_attribute_plugin=False,
+        name="",
     ):
-        self.url = url
         self.text = text
+        self.url = url
         self.icon = icon
         self.additional_classes = additional_classes
+        self.override_classes = override_classes
         self.message = message
-        self.append_id = append_id
-        self.ignore_attribute_plugin = ignore_attribute_plugin
+        self.name = name
 ```
 Let's go over each of these parameters
 #### url
-The route we will navigate to when the action button is clicked. This route can be individualized to the current row but setting `append_id=True`. For example, if you had the following:
+The route we will navigate to when the action button is clicked. This route can be individualized to the current row by injecting `{row_id}`. For example, if you had the following:
 ```python
-pre_action_buttons = [GridActionButton(url=URL('my_special_function'),
-                                       append_id=True)]
+pre_action_buttons = [ActionButton("clickme", URL('my_special_function/{row_id}'))]
 ```
 ...you're url would end id `/my_special_function/999` where 999 is the id of the current row.
 #### text
@@ -56,9 +64,6 @@ A string or list of additional css classes to be included with the standard grid
 
 #### message
 If a message is provided it will be presented to the user as a popup confirmation message when the action button is clicked. If the user clicks OK, the grid proceeds to the specified route. If canceled, nothing happens.
-
-#### append_id
-As discussed earlier this can be used to have the grid automatically append the row 'id' field at the end of the provided url.
 
 #### ignore_attributes_plugin
 A concept we have not yet explored is that of the Attribute Plugin. We'll be discussing in detail in the [htmx - Advanced reactive grids](docs/htmx.md) section.
@@ -83,21 +88,18 @@ For this example we're going to build a grid over the product table and include 
 Add the following to controllers.py.
 
 ```python
-@action("action_buttons", method=["POST", "GET"])
-@action("action_buttons/<path:path>", method=["POST", "GET"])
+@action("action_buttons")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def action_buttons(path=None):
-    pre_action_buttons = [GridActionButton(url=URL('reorder'),
-                                           text=f'Reorder',
-                                           icon='fa-redo',
-                                           message='Do you want to reorder this product',
-                                           append_id=True)]
+def action_buttons():
+    pre_action_buttons = [ActionButton(text=f'Reorder',
+                                       url=URL('reorder/{row_id}'),
+                                       icon='fa-redo',
+                                       message='Do you want to reorder this product')]
     grid = Grid(
-        path,
         db.product,
         columns=[db.product.name,
                  db.product.quantity_per_unit,
@@ -110,25 +112,6 @@ def action_buttons(path=None):
     )
 
     return dict(grid=grid)
-
-class GridActionButton:
-    def __init__(
-        self,
-        url,
-        text=None,
-        icon=None,
-        additional_classes="",
-        message="",
-        append_id=False,
-        ignore_attribute_plugin=False,
-    ):
-        self.url = url
-        self.text = text
-        self.icon = icon
-        self.additional_classes = additional_classes
-        self.message = message
-        self.append_id = append_id
-        self.ignore_attribute_plugin = ignore_attribute_plugin
 ```
 Be sure to add URL to the imports 
 ```python
@@ -143,21 +126,19 @@ Now you've added a simple pre action button to your grid and provided a popup co
 Building upon the previous example we're going to add the product name to the action button text. This will demonstrate the use of lambda functions in building your action button.
 
 ```python
-@action("action_buttons", method=["POST", "GET"])
-@action("action_buttons/<path:path>", method=["POST", "GET"])
+@action("action_buttons")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def action_buttons(path=None):
-    pre_action_buttons = [lambda row: GridActionButton(url=URL('reorder'),
-                                           text=f'Reorder {row.name}',
-                                           icon='fa-redo',
-                                           message=f'Do you want to reorder {row.name}?',
-                                           append_id=True)]
+def action_buttons():
+    pre_action_buttons = [lambda row: GridActionButton(
+                                      text=f'Reorder {row.name}',
+                                      url=URL('reorder/{row_id}'),
+                                      icon='fa-redo',
+                                      message=f'Do you want to reorder {row.name}?')]
     grid = Grid(
-        path,
         db.product,
         columns=[db.product.name,
                  db.product.quantity_per_unit,
@@ -171,25 +152,6 @@ def action_buttons(path=None):
 
     return dict(grid=grid)
 
-
-class GridActionButton:
-    def __init__(
-        self,
-        url,
-        text=None,
-        icon=None,
-        additional_classes="",
-        message="",
-        append_id=False,
-        ignore_attribute_plugin=False,
-    ):
-        self.url = url
-        self.text = text
-        self.icon = icon
-        self.additional_classes = additional_classes
-        self.message = message
-        self.append_id = append_id
-        self.ignore_attribute_plugin = ignore_attribute_plugin
 ```
 
 Refresh your page and now the product name has been added to the button text and to the popup confirmation message.
@@ -199,21 +161,19 @@ Refresh your page and now the product name has been added to the button text and
 ## Conditional Action Buttons
 Going one step further we'll now hide or show the pre action button based on some criteria in the row.
 ```python
-@action("action_buttons", method=["POST", "GET"])
-@action("action_buttons/<path:path>", method=["POST", "GET"])
+@action("action_buttons")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def action_buttons(path=None):
-    pre_action_buttons = [lambda row: (GridActionButton(url=URL('reorder'),
-                                           text=f'Reorder {row.name}',
-                                           icon='fa-redo',
-                                           message=f'Do you want to reorder {row.name}?',
-                                           append_id=True)) if row.in_stock <= row.reorder_level else None]
+def action_buttons():
+    pre_action_buttons = [lambda row: ActionButton(
+                                       text=f'Reorder {row.name}',
+                                       url=URL('reorder/{row_id}'),
+                                       icon='fa-redo',
+                                       message=f'Do you want to reorder {row.name}?')]
     grid = Grid(
-        path,
         db.product,
         columns=[db.product.name,
                  db.product.quantity_per_unit,
@@ -227,25 +187,6 @@ def action_buttons(path=None):
 
     return dict(grid=grid)
 
-
-class GridActionButton:
-    def __init__(
-        self,
-        url,
-        text=None,
-        icon=None,
-        additional_classes="",
-        message="",
-        append_id=False,
-        ignore_attribute_plugin=False,
-    ):
-        self.url = url
-        self.text = text
-        self.icon = icon
-        self.additional_classes = additional_classes
-        self.message = message
-        self.append_id = append_id
-        self.ignore_attribute_plugin = ignore_attribute_plugin
 ```
 Refresh the page again and now the Reorder button only appears if the in stock level falls below the reorder level.
 

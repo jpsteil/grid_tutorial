@@ -21,27 +21,25 @@ For our CRUD examples we'll be creating CRUD forms over the customer table. No c
 Let's start by revisiting our customer grid and adding a copy of it to controllers.py. We'll rename the route and the method from search to crud.
 
 ```python
-@action("crud", method=["POST", "GET"])
-@action("crud/<path:path>", method=["POST", "GET"])
+@action("crud")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def crud(path=None):
-    search_queries = [
+def crud():
+    custom_search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
         ["contact", lambda value: db.customer.contact.contains(value)],
         ["title", lambda value: db.customer.title.contains(value)],
         ["district", lambda value: db.district.name.contains(value)],
     ]
     grid = Grid(
-        path,
         db.customer,
         columns=[db.customer.name, db.customer.contact, db.customer.title, db.district.name],
         left=[db.district.on(db.customer.district == db.district.id)],
         headings=['Name', 'Contact', 'Title', "District"],
-        search_queries=search_queries,        
+        search_queries=custom_search_queries,        
         **GRID_DEFAULTS,
     )
 
@@ -51,27 +49,25 @@ If you navigate to this grid in your app you'll see that all CRUD capabilities a
 
 If we want to disable read access to our customer table, we can set `details=False` in our Grid call.
 ```python
-@action("crud", method=["POST", "GET"])
-@action("crud/<path:path>", method=["POST", "GET"])
+@action("crud")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def crud(path=None):
-    search_queries = [
+def crud():
+    custom_search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
         ["contact", lambda value: db.customer.contact.contains(value)],
         ["title", lambda value: db.customer.title.contains(value)],
         ["district", lambda value: db.district.name.contains(value)],
     ]
     grid = Grid(
-        path,
         db.customer,
         columns=[db.customer.name, db.customer.contact, db.customer.title, db.district.name],
         left=[db.district.on(db.customer.district == db.district.id)],
         headings=['Name', 'Contact', 'Title', "District"],
-        search_queries=search_queries,
+        search_queries=custom_search_queries,
         details=False,
         **GRID_DEFAULTS,
     )
@@ -91,23 +87,21 @@ User based access is the typical use case for Condition based access control. Ho
 
 Update your 'crud' code in controllers.py to match this.
 ```python
-@action("crud", method=["POST", "GET"])
-@action("crud/<path:path>", method=["POST", "GET"])
+@action("crud")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def crud(path=None):
+def crud():
     group_number = 1
-    search_queries = [
+    custom_search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
         ["contact", lambda value: db.customer.contact.contains(value)],
         ["title", lambda value: db.customer.title.contains(value)],
         ["district", lambda value: db.district.name.contains(value)],
     ]
     grid = Grid(
-        path,
         db.customer,
         columns=[
             db.customer.name,
@@ -117,7 +111,7 @@ def crud(path=None):
         ],
         left=[db.district.on(db.customer.district == db.district.id)],
         headings=["Name", "Contact", "Title", "District"],
-        search_queries=search_queries,        create=can_user_access("create", group_number),
+        search_queries=custom_search_queries,        create=can_user_access("create", group_number),
         details=can_user_access("details", group_number),
         editable=can_user_access("editable", group_number),
         deletable=can_user_access("deletable", group_number),
@@ -157,23 +151,21 @@ For our example we're going to allow all users to Create a record, but you can o
 
 Here is how we'd do that.
 ```python
-@action("crud", method=["POST", "GET"])
-@action("crud/<path:path>", method=["POST", "GET"])
+@action("crud")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def crud(path=None):
+def crud():
     group_number = 7
-    search_queries = [
+    custom_search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
         ["contact", lambda value: db.customer.contact.contains(value)],
         ["title", lambda value: db.customer.title.contains(value)],
         ["district", lambda value: db.district.name.contains(value)],
     ]
     grid = Grid(
-        path,
         db.customer,
         columns=[
             db.customer.name,
@@ -183,7 +175,7 @@ def crud(path=None):
         ],
         left=[db.district.on(db.customer.district == db.district.id)],
         headings=["Name", "Contact", "Title", "District"],
-        search_queries=search_queries,
+        search_queries=custom_search_queries,
         field_id=db.customer.id,
         details=lambda row: True
         if (
@@ -233,26 +225,24 @@ For our example we are going to set the grid so when you edit a record, you are 
 There are 2 steps to this. First we need to determine when the grid wants to make an edit form. Second, when we know we're going to make an edit form, make the name field read-only.
 
 ```python
-@action("crud", method=["POST", "GET"])
-@action("crud/<path:path>", method=["POST", "GET"])
+@action("crud")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def crud(path=None):
-    if path and path.split("/")[0] == "edit":
+def crud():
+    if request.query.get("mode") == "edit":
         # we're going to build or process the edit form
         db.customer.name.writable = False
 
-    search_queries = [
+    custom_search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
         ["contact", lambda value: db.customer.contact.contains(value)],
         ["title", lambda value: db.customer.title.contains(value)],
         ["district", lambda value: db.district.name.contains(value)],
     ]
     grid = Grid(
-        path,
         db.customer,
         columns=[
             db.customer.name,
@@ -262,7 +252,7 @@ def crud(path=None):
         ],
         left=[db.district.on(db.customer.district == db.district.id)],
         headings=["Name", "Contact", "Title", "District"],
-        search_queries=search_queries,
+        search_queries=custom_search_queries,
         field_id=db.customer.id,
         details=lambda row: True
         if (
@@ -289,44 +279,36 @@ def crud(path=None):
 ```
 All that we added to our controller was the following:
 ```python
-    if path and path.split("/")[0] == "edit":
+    if request.query.get("mode") == "edit":
         # we're going to build or process the edit form
         db.customer.name.writable = False
 ```
 
-The path variable being passed in will contain the url string after the route. So, if we split based on the / we can check if the first element is 'edit' if so, we know we're processing an edit action. The other values here could be 'new' or 'details'.
-
-For future reference, if our action is edit or details, the following will give you the record id of the record you're working with:
-```python
-if path:
-    grid_action, record_id, *_ = path.split('/')
-```
 
 Now, for the details action we aren't going to display the country or district fields.
 ```python
-@action("crud", method=["POST", "GET"])
-@action("crud/<path:path>", method=["POST", "GET"])
+@action("crud")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def crud(path=None):
-    if path and path.split("/")[0] == "edit":
+def crud():
+    mode = request.query.get("mode", "select")
+    if mode == "edit":
         # we're going to build or process the edit form
         db.customer.name.writable = False
-    elif path and path.split("/")[0] == "details":
+    else:
         db.customer.country.readable = False
         db.customer.district.readable = False
 
-    search_queries = [
+    custom_search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
         ["contact", lambda value: db.customer.contact.contains(value)],
         ["title", lambda value: db.customer.title.contains(value)],
         ["district", lambda value: db.district.name.contains(value)],
     ]
     grid = Grid(
-        path,
         db.customer,
         columns=[
             db.customer.name,
@@ -336,7 +318,7 @@ def crud(path=None):
         ],
         left=[db.district.on(db.customer.district == db.district.id)],
         headings=["Name", "Contact", "Title", "District"],
-        search_queries=search_queries,
+        search_queries=custom_search_queries,
         field_id=db.customer.id,
         details=lambda row: True
         if (
@@ -367,36 +349,35 @@ some defaults. We'll default the title field to 'President', the country to Unit
 the district to North. We'll complicate things a bit by not displaying the district on the 
 'new' page as well.
 ```python
-@action("crud", method=["POST", "GET"])
-@action("crud/<path:path>", method=["POST", "GET"])
+@action("crud")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def crud(path=None):
-    if path and path.split("/")[0] == "edit":
-        # we're going to build or process the edit form
-        db.customer.name.writable = False
-    elif path and path.split("/")[0] == "details":
-        db.customer.country.readable = False
-        db.customer.district.readable = False
-    elif path and path.split("/")[0] == "new":
+def crud():
+    mode = request.query.get("mode", "select")
+    if mode == "new":
         db.customer.title.default = "President"
         db.customer.country.default = "United States"
         north_district = db(db.district.name == "North").select().first()
         db.customer.district.default = north_district.id
         db.customer.district.readable = False
         db.customer.district.writable = False
+    elif mode == "edit":
+        # we're going to build or process the edit form
+        db.customer.name.writable = False
+    else:
+        db.customer.country.readable = False
+        db.customer.district.readable = False
 
-    search_queries = [
+    custom_search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
         ["contact", lambda value: db.customer.contact.contains(value)],
         ["title", lambda value: db.customer.title.contains(value)],
         ["district", lambda value: db.district.name.contains(value)],
     ]
     grid = Grid(
-        path,
         db.customer,
         columns=[
             db.customer.name,
@@ -406,7 +387,7 @@ def crud(path=None):
         ],
         left=[db.district.on(db.customer.district == db.district.id)],
         headings=["Name", "Contact", "Title", "District"],
-        search_queries=search_queries,
+        search_queries=custom_search_queries,
         field_id=db.customer.id,
         details=lambda row: True
         if (
@@ -451,7 +432,7 @@ in the following.
 
 ```html
 [[extend 'layout.html']]
-[[if grid.action == 'details': ]]
+[[if grid.mode == 'details': ]]
     [[form = grid.render() ]]
     [[=form.custom.begin ]]
     <div class="card mb-1">
@@ -494,36 +475,35 @@ parameters and then call `grid.process()`.
 Yes, that is a lot to take in. Here is how you can change the text on the Submit button 
 for the details action.
 ```python
-@action("crud", method=["POST", "GET"])
-@action("crud/<path:path>", method=["POST", "GET"])
+@action("crud")
 @action.uses(
     "customer_grid.html",
     session,
     db,
 )
-def crud(path=None):
-    if path and path.split("/")[0] == "edit":
-        # we're going to build or process the edit form
-        db.customer.name.writable = False
-    elif path and path.split("/")[0] == "details":
-        db.customer.country.readable = False
-        db.customer.district.readable = False
-    elif path and path.split("/")[0] == "new":
+def crud():
+    mode = request.guery.get("mode", "select")
+    if mode == "new":
         db.customer.title.default = "President"
         db.customer.country.default = "United States"
         north_district = db(db.district.name == "North").select().first()
         db.customer.district.default = north_district.id
         db.customer.district.readable = False
         db.customer.district.writable = False
+    elif mode == "edit":
+        # we're going to build or process the edit form
+        db.customer.name.writable = False
+    else:
+        db.customer.country.readable = False
+        db.customer.district.readable = False
 
-    search_queries = [
+    custom_search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
         ["contact", lambda value: db.customer.contact.contains(value)],
         ["title", lambda value: db.customer.title.contains(value)],
         ["district", lambda value: db.district.name.contains(value)],
     ]
     grid = Grid(
-        path,
         db.customer,
         columns=[
             db.customer.name,
@@ -533,7 +513,7 @@ def crud(path=None):
         ],
         left=[db.district.on(db.customer.district == db.district.id)],
         headings=["Name", "Contact", "Title", "District"],
-        search_queries=search_queries,
+        search_queries=custom_search_queries,
         field_id=db.customer.id,
         details=lambda row: True
         if (
