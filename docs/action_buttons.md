@@ -50,7 +50,7 @@ Let's go over each of these parameters
 #### url
 The route we will navigate to when the action button is clicked. This route can be individualized to the current row by injecting `{row_id}`. For example, if you had the following:
 ```python
-pre_action_buttons = [ActionButton("clickme", URL('my_special_function') + '/{row_id}')]
+pre_action_buttons = [ActionButton("clickme", URL('my_special_function/{row_id}'))]
 ```
 ...you're url would end id `/my_special_function/999` where 999 is the id of the current row.
 #### text
@@ -96,7 +96,7 @@ Add the following to controllers.py.
 )
 def action_buttons():
     pre_action_buttons = [ActionButton(text=f'Reorder',
-                                       url=URL('reorder') + '/{row_id}',
+                                       url=URL('reorder/{row_id}'),
                                        icon='fa-redo',
                                        message='Do you want to reorder this product')]
     grid = Grid(
@@ -135,7 +135,7 @@ Building upon the previous example we're going to add the product name to the ac
 def action_buttons():
     pre_action_buttons = [lambda row: GridActionButton(
                                       text=f'Reorder {row.name}',
-                                      url=URL('reorder') + '/{row_id}',
+                                      url=URL('reorder/{row_id}'),
                                       icon='fa-redo',
                                       message=f'Do you want to reorder {row.name}?')]
     grid = Grid(
@@ -170,7 +170,7 @@ Going one step further we'll now hide or show the pre action button based on som
 def action_buttons():
     pre_action_buttons = [lambda row: ActionButton(
                                        text=f'Reorder {row.name}',
-                                       url=URL('reorder') + '/{row_id}',
+                                       url=URL('reorder/{row_id}'),
                                        icon='fa-redo',
                                        message=f'Do you want to reorder {row.name}?')]
     grid = Grid(
