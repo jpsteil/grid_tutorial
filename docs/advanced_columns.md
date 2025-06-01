@@ -55,16 +55,14 @@ For our Advanced Column examples we're going to build upon the customer grid we 
 
 Copy the code below and add it to controllers.py.
 ```python
-@action("advanced_columns", method=["POST", "GET"])
-@action("advanced_columns/<path:path>", method=["POST", "GET"])
+@action("advanced_columns")
 @action.uses(
     "customer_grid.html",
     session,
     db,
 )
-def advanced_columns(path=None):
+def advanced_columns():
     grid = Grid(
-        path,
         db.customer,
         columns=[
             Column('name',
@@ -97,16 +95,14 @@ A couple of things to note.
 Let's add the ability to sort by our custom columns by clicking on the column header.
 
 ```python
-@action("advanced_columns", method=["POST", "GET"])
-@action("advanced_columns/<path:path>", method=["POST", "GET"])
+@action("advanced_columns")
 @action.uses(
     "customer_grid.html",
     session,
     db,
 )
-def advanced_columns(path=None):
+def advanced_columns():
     grid = Grid(
-        path,
         db.customer,
         columns=[
             Column('name',
@@ -151,16 +147,14 @@ The py4web grid has it's own system to determine how to style a column. When usi
 
 In you custom Column you can set `td_class_style="grid-cell-type-decimal"` to have the grid format the cell like it would a decimal value. In this case it will justify the text to the right as seen here with the Contact column.
 ```python
-@action("advanced_columns", method=["POST", "GET"])
-@action("advanced_columns/<path:path>", method=["POST", "GET"])
+@action("advanced_columns")
 @action.uses(
     "customer_grid.html",
     session,
     db,
 )
-def advanced_columns(path=None):
+def advanced_columns():
     grid = Grid(
-        path,
         db.customer,
         columns=[
             Column('name',

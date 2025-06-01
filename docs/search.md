@@ -2,16 +2,14 @@
 
 For this section we are going to add a new controller with basically the same code that we left off with in the Basic Columns section using the LEFT OUTER JOIN. We just have to change a few names.  Add this code to controllers.py.
 ```python
-@action("search", method=["POST", "GET"])
-@action("search/<path:path>", method=["POST", "GET"])
+@action("search")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def search(path=None):
+def search():
     grid = Grid(
-        path,
         db.customer,
         columns=[db.customer.name, db.customer.contact, db.customer.title, db.district.name],
         left=[db.district.on(db.customer.district == db.district.id)],
@@ -31,27 +29,25 @@ A search_query is a list of 2 pieces of information.
 
 Here is our new controller
 ```python
-@action("search", method=["POST", "GET"])
-@action("search/<path:path>", method=["POST", "GET"])
+@action("search")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def search(path=None):
-    search_queries = [
+def search():
+    custom_search_queries = [
         ["name", lambda value: db.customer.name.contains(value)],
         ["contact", lambda value: db.customer.contact.contains(value)],
         ["title", lambda value: db.customer.title.contains(value)],
         ["district", lambda value: db.district.name.contains(value)],
     ]
     grid = Grid(
-        path,
         db.customer,
         columns=[db.customer.name, db.customer.contact, db.customer.title, db.district.name],
         left=[db.district.on(db.customer.district == db.district.id)],
         headings=["Name", "Contact", "Title", "District"],
-        search_queries=search_queries,
+        search_queries=custom_search_queries,
         **GRID_DEFAULTS,
     )
 

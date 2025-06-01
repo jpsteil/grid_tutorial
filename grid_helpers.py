@@ -4,7 +4,6 @@ from urllib.parse import unquote_plus
 
 from py4web import request, Field, response
 from py4web.utils.form import Form, FormStyleBulma
-from py4web.utils.grid import AttributesPluginHtmx
 
 from yatl.helpers import (
     TAG,
@@ -160,28 +159,6 @@ def apply_htmx_attrs(grid, target):
     grid.attributes_plugin["button_page_number"] = lambda attrs: attrs.update(myattrs)
 
 
-class GridActionButton:
-    def __init__(
-        self,
-        url,
-        text=None,
-        icon=None,
-        onclick=None,
-        additional_classes="",
-        message="",
-        append_id=False,
-        ignore_attribute_plugin=False,
-    ):
-        self.url = url
-        self.text = text
-        self.icon = icon
-        self.onclick = onclick
-        self.additional_classes = additional_classes
-        self.message = message
-        self.append_id = append_id
-        self.ignore_attribute_plugin = ignore_attribute_plugin
-
-
 def get_referrer(r, default):
     referrer = r.query.get("_referrer")
     url = default
@@ -209,7 +186,6 @@ def enable_htmx_grid(htmx_grid, target, default_referrer, after_swap=None):
     -------
 
     """
-    htmx_grid.attributes_plugin = AttributesPluginHtmx(target)
     attrs = {
         "_hx-get": get_referrer(
             request,
@@ -221,7 +197,7 @@ def enable_htmx_grid(htmx_grid, target, default_referrer, after_swap=None):
     htmx_grid.param.edit_sidecar = BUTTON("Cancel", **attrs)
 
     if after_swap:
-        if htmx_grid.action.lower() == "select":
+        if htmx_grid.mode.lower() == "select":
             response.headers["HX-Trigger-After-Swap"] = after_swap
 
     htmx_grid.process()

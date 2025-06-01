@@ -206,7 +206,6 @@ Grid search takes the search queries list and the default queries and builds our
 
 ```python
 grid = Grid(
-    path,
     query=search.query,
     columns=[
         db.customer.name,
@@ -225,14 +224,13 @@ grid = Grid(
 Putting it all together, our first advanced search grid controller looks like this:
 
 ```python
-@action("advanced_search", method=["POST", "GET"])
-@action("advanced_search/<path:path>", method=["POST", "GET"])
+@action("advanced_search")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def advanced_search(path=None):
+def advanced_search():
     search_queries = [
         GridSearchQuery(
             "Search by name or contact or title",
@@ -245,7 +243,6 @@ def advanced_search(path=None):
     search = GridSearch(search_queries, queries=[db.customer.id > 0])
 
     grid = Grid(
-        path,
         query=search.query,
         columns=[
             db.customer.name,

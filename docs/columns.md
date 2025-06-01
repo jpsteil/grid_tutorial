@@ -27,16 +27,14 @@ db.define_table(
 Now, add another controller method. We'll start with the same simple grid concept we used with our Basic Grid.
 
 ```python
-@action("columns", method=["POST", "GET"])
-@action("columns/<path:path>", method=["POST", "GET"])
+@action("columns")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def districts(path=None):
+def districts():
     grid = Grid(
-        path,
         db.customer,
         **GRID_DEFAULTS,
     )
@@ -47,16 +45,14 @@ Now, take a look at http://127.0.0.1:8000/grid_tutorial/columns. It doesn't look
 
 For this example lets assume we want to see the name, contact and title fields. We can do that with this code.
 ```python
-@action("columns", method=["POST", "GET"])
-@action("columns/<path:path>", method=["POST", "GET"])
+@action("columns")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def districts(path=None):
+def districts():
     grid = Grid(
-        path,
         db.customer,
         columns=[db.customer.name, db.customer.contact, db.customer.title],
         **GRID_DEFAULTS,
@@ -68,16 +64,14 @@ Now our grid looks a little nicer.
 
 Let's add the district field to this display.
 ```python
-@action("columns", method=["POST", "GET"])
-@action("columns/<path:path>", method=["POST", "GET"])
+@action("columns")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def districts(path=None):
+def districts():
     grid = Grid(
-        path,
         db.customer,
         columns=[db.customer.name, db.customer.contact, db.customer.title, db.customer.district],
         **GRID_DEFAULTS,
@@ -124,16 +118,14 @@ Refresh your grid and now you'll see the district name where a district exists a
 ### using a left join
 A better solution to this issue is to join the district table and use the name field in the column list.  That is done like this:
 ```python
-@action("columns", method=["POST", "GET"])
-@action("columns/<path:path>", method=["POST", "GET"])
+@action("columns")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def columns(path=None):
+def columns():
     grid = Grid(
-        path,
         db.customer,
         columns=[db.customer.name, db.customer.contact, db.customer.title, db.district.name],
         left=[db.district.on(db.customer.district == db.district.id)]
@@ -144,16 +136,14 @@ def columns(path=None):
 ```
 This should look similar. However, there are 2 difference. The first is that the field label from the district.name field is used as the column header. Of course this isn't desirable but we can fix it by using the headings parameter.
 ```python
-@action("columns", method=["POST", "GET"])
-@action("columns/<path:path>", method=["POST", "GET"])
+@action("columns")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def columns(path=None):
+def columns():
     grid = Grid(
-        path,
         db.customer,
         columns=[db.customer.name, db.customer.contact, db.customer.title, db.district.name],
         left=[db.district.on(db.customer.district == db.district.id)],

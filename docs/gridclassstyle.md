@@ -24,7 +24,7 @@ my_form = Form(tablname, formstyle=FormStyleBulma)
 or
 
 ```python
-my_grid = Grid(path, tablename, formstyle=FormStyleBulma, grid_class_style=GridClassStyleBulma)
+my_grid = Grid(tablename, formstyle=FormStyleBulma, grid_class_style=GridClassStyleBulma)
 ```
 
 As you can see, it can be a bother to have to provide multiple boilerplate options to our grids 
@@ -53,7 +53,7 @@ Example assuming you are in controllers.py
 ```python
 from .common import GRID_DEFAULTS
 
-my_grid = Grid(path, tablename, **GRID_DEFAULTS)
+my_grid = Grid(db[tablename], **GRID_DEFAULTS)
 ```
 
 [Back to Index](../README.md)

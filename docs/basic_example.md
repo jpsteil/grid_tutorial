@@ -20,16 +20,14 @@ db.commit()
 Next we'll create a controller method to handle the basic_grid endpoint to the controllers.py file.
 
 ```python
-@action("basic_grid", method=["POST", "GET"])
-@action("basic_grid/<path:path>", method=["POST", "GET"])
+@action("basic_grid")
 @action.uses(
     "grid.html",
     session,
     db,
 )
-def basic_grid(path=None):
+def basic_grid():
     grid = Grid(
-        path,
         db.district,
         **GRID_DEFAULTS,
     )
