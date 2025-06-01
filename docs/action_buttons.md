@@ -14,71 +14,48 @@ This section will explore the different options for creating your own action but
 - [Advanced Action Buttons with lambda](#advanced-action-buttons-with-lambda)
 - [Conditional Action Buttons](#conditional-action-buttons)
 
-## Defining the Action Button object
-The py4web grid include a sample action button object,
+## Defining the custom button
+The py4web a custom button can be created using a helper or a dict, or a lambda that takes a row and returns a helper or a dict.
+For example:
 
 ```python
-from py4web.utils.grid import ActionButton
+button = lambda row: A("click me", _href=URL("goto", row.id))
 ```
 
-
-but you can defined your own as lohng as you have rthese fields:
+or 
 
 ```python
+button = lambda row: dict(
+    text = "click me",
+    url = URL("goto", row.id),
+    icon = "fa fa-gear",
+    classes = "myclass1 myclass2"
+    kind = "grid-action-button")
 
 
-class ActionButton:
-    def __init__(
-        self,
-        text,
-        url,
-        icon=None,
-        additional_classes=None,
-        override_classes=None,
-        message="",
-        name="",
-    ):
-        self.text = text
-        self.url = url
-        self.icon = icon
-        self.additional_classes = additional_classes
-        self.override_classes = override_classes
-        self.message = message
-        self.name = name
 ```
-Let's go over each of these parameters
-#### url
-The route we will navigate to when the action button is clicked. This route can be individualized to the current row by injecting `{row_id}`. For example, if you had the following:
-```python
-pre_action_buttons = [ActionButton("clickme", URL('my_special_function/{row_id}'))]
-```
-...you're url would end id `/my_special_function/999` where 999 is the id of the current row.
+Let's go over each of the parameters
+
 #### text
 The text to appear on the button. This one is fairly self-explanatory. If you have text set, but also have `include_action_button_text=False` on your Grid call, no text will appear.
+
+#### url
+The route we will navigate to when the action button is clicked.
+```python
+pre_action_buttons = [lambda row: dict(text="clickme", url=URL('my_special_function', row.id))]
+```
+...you're url would end id `/my_special_function/999` where 999 is the id of the current row.
 
 #### icon
 This is the font-awesome icon to be included on the button. The default layout.py provided by py4web includes a link to the free font-awesome icon set. You can find the available icons [at this link (current at the time of this writing)](https://fontawesome.com/v5.15/icons?d=gallery&p=2&m=free).
 
-#### additional_classes
-A string or list of additional css classes to be included with the standard grid css classes based on the GridClassStyle of the Grid. You could also provide a callable that will be passed the current grid row. The callable should return a string or list of additional css classes.
+#### classes
+A string or list of classes to be included with the standard grid css classes based on the GridClassStyle of the Grid.
+If a know button ``kind`` is provided, the classes will be appended to those of the known kind. If you do not want them appended,
+just pass an empty ``kind``.
 
-#### message
-If a message is provided it will be presented to the user as a popup confirmation message when the action button is clicked. If the user clicks OK, the grid proceeds to the specified route. If canceled, nothing happens.
-
-#### ignore_attributes_plugin
-A concept we have not yet explored is that of the Attribute Plugin. We'll be discussing in detail in the [htmx - Advanced reactive grids](docs/htmx.md) section.
-
-An attribute plugin allows you to automatically insert additional attributes into your grid and form html elements. There are times when you are using an attribute plugin that you want to ignore that plugin for certain actions. Setting this parameter to True tells the grid to disregard any attribute plugins and craft the associated route without the additional attributes.
-
-Again, we'll look at this more closely in [htmx - Advanced reactive grids](docs/htmx.md).
-
-TODO: update grid.py to complete the support for the following parameters on the action button class and then update this document to reflect the additions.
-
-- additional_styles - a string or list of additional css styles to be included with the standard grid css styles based on the GridClassStyle of the Grid. You could also provide a callable that will be passed the current grid row. The callable should return a string or list of additional css styles.
-- override_classes - a string or list of css classes that will replace the standard grid css classes of the GridClassStyle of the Grid. You could also provide a callable that will be passed the current grid row. The callable should return a string or list of css classes
-- override_styles - a string or list of css styles that will replace the standard grid css styles of the GridClassStyle of the Grid. You could also provide a callable that will be passed the current grid row. The callable should return a string or list of css styles
-
-The _make_action_button method already supports these parameters. They need to be added to the make_action_buttons method and passed through to _make_action_button.
+#### kind
+Identifies the button kind name for its default behavior. For example "grid-action-button", "grid-header-button", "grid-footer-button".
 
 [back to top](#action-buttons)
 
@@ -95,10 +72,11 @@ Add the following to controllers.py.
     db,
 )
 def action_buttons():
-    pre_action_buttons = [ActionButton(text=f'Reorder',
-                                       url=URL('reorder/{row_id}'),
-                                       icon='fa-redo',
-                                       message='Do you want to reorder this product')]
+    pre_action_buttons = [lambda row: dict(
+        text=f'Reorder',
+        url=URL('reorder', row.id),
+        icon='fa-redo'
+    ]
     grid = Grid(
         db.product,
         columns=[db.product.name,
@@ -118,8 +96,6 @@ Be sure to add URL to the imports
 from py4web import action, URL
 ```
 
-Now you've added a simple pre action button to your grid and provided a popup confirmation message. Navigate to the Action Buttons option in your application to see the button added.
-
 [back to top](#action-buttons)
 
 ## Advanced Action Buttons with lambda
@@ -133,11 +109,13 @@ Building upon the previous example we're going to add the product name to the ac
     db,
 )
 def action_buttons():
-    pre_action_buttons = [lambda row: GridActionButton(
-                                      text=f'Reorder {row.name}',
-                                      url=URL('reorder/{row_id}'),
-                                      icon='fa-redo',
-                                      message=f'Do you want to reorder {row.name}?')]
+    pre_action_buttons = [lambda row: dict(
+            text=f"Reorder {row.name}",
+            url=URL("reorder", row.id),
+            icon="fa-redo",
+            _tooltop="will reorder the rows",
+            _onclick="confirm('are you sure?')")
+    ]
     grid = Grid(
         db.product,
         columns=[db.product.name,
@@ -168,11 +146,10 @@ Going one step further we'll now hide or show the pre action button based on som
     db,
 )
 def action_buttons():
-    pre_action_buttons = [lambda row: ActionButton(
-                                       text=f'Reorder {row.name}',
-                                       url=URL('reorder/{row_id}'),
-                                       icon='fa-redo',
-                                       message=f'Do you want to reorder {row.name}?')]
+    pre_action_buttons = [lambda row: dict(
+        text=f'Reorder {row.name}',
+        url=URL('reorder', row.id),
+        icon='fa-redo')]
     grid = Grid(
         db.product,
         columns=[db.product.name,
