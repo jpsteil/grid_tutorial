@@ -187,7 +187,7 @@ def action_buttons():
         lambda row: (
             ActionButton(
                 text=f"Reorder {row.name}",
-                url=URL("reorder/{row_id}"),
+                url=URL("reorder") + "/{row_id}",
                 icon="fa-redo",
                 message=f"Do you want to reorder {row.name}?",
             )
