@@ -1,10 +1,11 @@
 from yatl import XML
 
 from py4web import action, URL, request
-from py4web.utils.grid import Grid, Column, ActionButton
+from py4web.utils.grid import Grid, Column
 from .common import unauthenticated, session, db, GRID_DEFAULTS
 from .grid_helpers import GridSearchQuery, GridSearch
 from pydal.validators import IS_NULL_OR, IS_IN_DB, IS_IN_SET
+from yatl.helpers import A, I
 
 
 @unauthenticated("index", "index.html")
@@ -175,6 +176,19 @@ def can_user_access(action, group_number):
             return True
     return False
 
+def reorder_button(row):
+        if row.in_stock > row.reorder_level:
+            return None
+        button = A(
+            I(_class="fas fa-redo"),
+            _href=URL(f"reorder/{row.id}"),
+            _role="button",
+            _title=f"Reorder {row.name}",
+            _message=f"Do you want to reorder {row.name}?",
+            _class="button grid-button is-small",
+        )
+        button.append(XML("&nbsp;Reorder"))
+        return button
 
 @action("action_buttons")
 @action.uses(
@@ -184,16 +198,7 @@ def can_user_access(action, group_number):
 )
 def action_buttons():
     pre_action_buttons = [
-        lambda row: (
-            ActionButton(
-                text=f"Reorder {row.name}",
-                url=URL("reorder/{row_id}"),
-                icon="fa-redo",
-                message=f"Do you want to reorder {row.name}?",
-            )
-        )
-        if row.in_stock <= row.reorder_level
-        else None
+        lambda row: reorder_button(row),
     ]
 
     grid = Grid(
